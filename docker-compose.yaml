@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rs_tracker_app
+    volumes:
+      - ./html/:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - symfony_network
+    depends_on:
+      - db
+
+  web:
+    image: nginx:alpine
+    container_name: nginx_server
+    volumes:
+      - .:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "9876:9876"
+    networks:
+      - symfony_network
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - symfony_network
+
+networks:
+  symfony_network:
+
+volumes:
+  db_data:

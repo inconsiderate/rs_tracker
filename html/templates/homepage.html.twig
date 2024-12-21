@@ -1,0 +1,79 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+
+</br>
+</br>
+</br>
+
+<div class="card-group support">
+    <div class="card ">
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <div class="card-body">
+            <h5 class="card-title text-center">Your Stars History</h5>
+            <p class="card-text">
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Story Title</th>
+      <th scope="col">RS List</th>
+      <th scope="col">Consecutive<br/>Time on RS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Dec 20, 2024</th>
+      <td>The Isekai Police- LitRPG | OP Protagonist</td>
+      <td>Main Page</td>
+      <td>9 hours <i class="fa fa-star"></i></td>
+    </tr>
+    <tr>
+      <th scope="row">Dec 19, 2024</th>
+      <td>A Duke Out of Time (LITRPG Weak to Strong MC/Dungeon Delving Loot Adventure)</td>
+      <td>Action</td>
+      <td>14 days <i class="fa fa-star"></i></td>
+    </tr>
+    <tr>
+      <th scope="row">Dec 17, 2024</th>
+      <td>The Isekai Police- LitRPG | OP Protagonist</td>
+      <td>Main Page</td>
+      <td>6 hours</td>
+    </tr>
+    <tr>
+      <th scope="row">Dec 17, 2024</th>
+      <td>The Isekai Police- LitRPG | OP Protagonist</td>
+      <td>Adventure</td>
+      <td>15 minutes</td>
+    </tr>
+    <tr>
+      <th scope="row">Dec 2, 2024</th>
+      <td>A Duke Out of Time (LITRPG Weak to Strong MC/Dungeon Delving Loot Adventure)</td>
+      <td>Action</td>
+      <td>13 hours</td>
+    </tr>
+  </tbody>
+    <tfoot>
+      <th scope="row" colspan="4"><i class="fa fa-star"></i> = this title is currently on the list!</th>
+  </tfoot>
+</table>
+
+            </p>
+        </div>     
+        {% else %}
+        <div class="card-body">
+            <h5 class="card-title">Rising Stars Tracker</h5>
+            <p class="card-text">Track your rising star! <a href="/login">Login</a> or <a href="/register">register</a> to get started. :) </p>
+            <i class="h1 fa-brands fa-discord"></i>
+            <i class="h1 fa-brands fa-github"></i>
+        </div>
+        <img src="{{ asset('images/helpyou.jpg') }}" class="card-img-top mx-auto" alt="...Help you.">
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
