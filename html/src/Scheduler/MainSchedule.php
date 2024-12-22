@@ -19,11 +19,12 @@ final class MainSchedule implements ScheduleProviderInterface
 
     public function getSchedule(): Schedule
     {
-        if (_SERVER['APP_ENV'] == 'dev') {
+        if ($_SERVER['APP_ENV'] == 'dev') {
             $freq = '15 seconds';
         } else {
             $freq = '15 minutes';
         }
+
 
         return (new Schedule())
             ->add(RecurringMessage::every($freq, new CheckStarsLists()));
