@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\StoryTracker;
+use App\Entity\Story;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<StoryTracker>
+ * @extends ServiceEntityRepository<Story>
  */
-class StoryTrackerRepository extends ServiceEntityRepository
+class StoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, StoryTracker::class);
+        parent::__construct($registry, Story::class);
     }
 
     //    /**
-    //     * @return StoryTracker[] Returns an array of StoryTracker objects
+    //     * @return Story[] Returns an array of Story objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class StoryTrackerRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?StoryTracker
+    //    public function findOneBySomeField($value): ?Story
     //    {
     //        return $this->createQueryBuilder('s')
     //            ->andWhere('s.exampleField = :val')

@@ -2,7 +2,7 @@
 
 namespace App\MessageHandler;
 
-use App\Entity\StoryTracker;
+use App\Entity\Story;
 use App\Message\CheckStarsLists;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ final class CheckStarsListsHandler
     {
         $this->logger->notice('>>>> Generating arrays for Rising Stars checks...');
 
-        $storys = $this->entityManager->getRepository(StoryTracker::class)->findAll();
+        $storys = $this->entityManager->getRepository(Story::class)->findAll();
         $storyGenreMap = [];
         $allStories = [];
         

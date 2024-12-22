@@ -20,7 +20,7 @@ class RSMatch
 
     #[ORM\ManyToOne(inversedBy: 'rSMatches')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?StoryTracker $trackerID = null;
+    private ?Story $storyID = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $listPosition = null;
@@ -45,14 +45,14 @@ class RSMatch
         return $this;
     }
 
-    public function getTrackerID(): ?StoryTracker
+    public function getStoryID(): ?Story
     {
-        return $this->trackerID;
+        return $this->storyID;
     }
 
-    public function setTrackerID(?StoryTracker $trackerID): static
+    public function setStoryID(?Story $storyID): static
     {
-        $this->trackerID = $trackerID;
+        $this->storyID = $storyID;
 
         return $this;
     }

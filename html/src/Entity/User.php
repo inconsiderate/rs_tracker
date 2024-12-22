@@ -45,15 +45,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $isVerified = false;
 
     /**
-     * @var Collection<int, StoryTracker>
+     * @var Collection<int, Story>
      */
-    #[ORM\OneToMany(targetEntity: StoryTracker::class, mappedBy: 'UserStories', orphanRemoval: true)]
-    private Collection $storyTrackers;
+    #[ORM\OneToMany(targetEntity: Story::class, mappedBy: 'UserStories', orphanRemoval: true)]
+    private Collection $storys;
 
     public function __construct()
     {
         $this->rSMatches = new ArrayCollection();
-        $this->storyTrackers = new ArrayCollection();
+        $this->storys = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -174,29 +174,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, StoryTracker>
+     * @return Collection<int, Story>
      */
-    public function getStoryTrackers(): Collection
+    public function getStorys(): Collection
     {
-        return $this->storyTrackers;
+        return $this->storys;
     }
 
-    public function addStoryTracker(StoryTracker $storyTracker): static
+    public function addStory(Story $story): static
     {
-        if (!$this->storyTrackers->contains($storyTracker)) {
-            $this->storyTrackers->add($storyTracker);
-            $storyTracker->setUserStories($this);
+        if (!$this->storys->contains($story)) {
+            $this->storys->add($story);
+            $story->setUserStories($this);
         }
 
         return $this;
     }
 
-    public function removeStoryTracker(StoryTracker $storyTracker): static
+    public function removeStory(Story $story): static
     {
-        if ($this->storyTrackers->removeElement($storyTracker)) {
+        if ($this->storys->removeElement($story)) {
             // set the owning side to null (unless already changed)
-            if ($storyTracker->getUserStories() === $this) {
-                $storyTracker->setUserStories(null);
+            if ($story->getUserStories() === $this) {
+                $story->setUserStories(null);
             }
         }
 

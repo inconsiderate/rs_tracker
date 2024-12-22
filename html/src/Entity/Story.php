@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\StoryTrackerRepository;
+use App\Repository\StoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: StoryTrackerRepository::class)]
-class StoryTracker
+#[ORM\Entity(repositoryClass: StoryRepository::class)]
+class Story
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,15 +25,18 @@ class StoryTracker
     /**
      * @var Collection<int, RSMatch>
      */
-    #[ORM\OneToMany(targetEntity: RSMatch::class, mappedBy: 'trackerID', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: RSMatch::class, mappedBy: 'storyID', orphanRemoval: true)]
     private Collection $rSMatches;
 
-    #[ORM\ManyToOne(inversedBy: 'storyTrackers')]
+    #[ORM\ManyToOne(inversedBy: 'storys')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $UserStories = null;
 
     #[ORM\Column(length: 255)]
     private ?string $storyAddress = null;
+
+    #[ORM\Column]
+    private ?int $storyId = null;
 
     public function __construct()
     {
@@ -81,7 +84,7 @@ class StoryTracker
     {
         if (!$this->rSMatches->contains($rSMatch)) {
             $this->rSMatches->add($rSMatch);
-            $rSMatch->setTrackerID($this);
+            $rSMatch->setStoryID($this);
         }
 
         return $this;
@@ -91,8 +94,8 @@ class StoryTracker
     {
         if ($this->rSMatches->removeElement($rSMatch)) {
             // set the owning side to null (unless already changed)
-            if ($rSMatch->getTrackerID() === $this) {
-                $rSMatch->setTrackerID(null);
+            if ($rSMatch->getStoryID() === $this) {
+                $rSMatch->setStoryID(null);
             }
         }
 
@@ -119,6 +122,18 @@ class StoryTracker
     public function setStoryAddress(string $storyAddress): static
     {
         $this->storyAddress = $storyAddress;
+
+        return $this;
+    }
+
+    public function getStoryId(): ?int
+    {
+        return $this->storyId;
+    }
+
+    public function setStoryId(int $storyId): static
+    {
+        $this->storyId = $storyId;
 
         return $this;
     }

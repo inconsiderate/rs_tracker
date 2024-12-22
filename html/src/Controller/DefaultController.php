@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\StoryTracker;
-use App\Form\StoryTrackerFormType;
+use App\Entity\Story;
+use App\Form\StoryFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
@@ -40,7 +40,7 @@ class DefaultController extends AbstractController
         }
 
         // get data for page view
-        $stories = $entityManager->getRepository(StoryTracker::class)->findAll();
+        $stories = $entityManager->getRepository(Story::class)->findAll();
         $data = [];
         foreach ($stories as $story) {
             $data[] = [
@@ -51,13 +51,13 @@ class DefaultController extends AbstractController
         }
 
 
-        // Create a new StoryTracker instance
-        $storyTracker = new StoryTracker();
-        $trackerForm = $this->createForm(StoryTrackerFormType::class, $storyTracker);
-        $trackerForm->handleRequest($request);
+        // Create a new Story instance
+        $story = new Story();
+        $storyForm = $this->createForm(StoryFormType::class, $story);
+        $storyForm->handleRequest($request);
 
-        if ($trackerForm->isSubmitted() && $trackerForm->isValid()) {   
-            $storyUrl = $request->request->all('storytracker')['storyName'];
+        if ($storyForm->isSubmitted() && $storyForm->isValid()) {   
+            $storyUrl = $request->request->all('story')['storyName'];
 
             $htmlContent = file_get_contents($storyUrl);
             if ($htmlContent === false) {
@@ -68,20 +68,20 @@ class DefaultController extends AbstractController
             $crawler = new Crawler($htmlContent);
             $storyName = $crawler->filter('.fic-title h1')->text();
 
-            $trackedGenres = isset($request->request->all('storytracker')['trackedGenres']) ? $request->request->all('storytracker')['trackedGenres'] : null;
+            $trackedGenres = isset($request->request->all('story')['trackedGenres']) ? $request->request->all('story')['trackedGenres'] : null;
 
             if (!$storyName || !$trackedGenres){
                 $this->addFlash('error', 'Error: Both Name and at least one Genre must be selected');
                 return $this->redirectToRoute('app_trackers');
             }
-            // Set the logged-in user as the UserStories for the StoryTracker
-            $storyTracker->setUserStories($user);
-            $storyTracker->setStoryName($storyName);
-            $storyTracker->setStoryAddress($storyUrl);
-            $storyTracker->setTrackedGenres($trackedGenres);
+            // Set the logged-in user as the UserStories for the Story
+            $story->setUserStories($user);
+            $story->setStoryName($storyName);
+            $story->setStoryAddress($storyUrl);
+            $story->setTrackedGenres($trackedGenres);
     
-            // Persist the StoryTracker entity
-            $entityManager->persist($storyTracker);
+            // Persist the Story entity
+            $entityManager->persist($story);
             $entityManager->flush();
 
             // Redirect to another page (for example, the same profile page after saving)
@@ -90,7 +90,7 @@ class DefaultController extends AbstractController
 
         // Render the form view
         return $this->render('trackers.html.twig', [
-            'form' => $trackerForm->createView(),
+            'form' => $storyForm->createView(),
             'data' => $data,
         ]);
     }
@@ -99,7 +99,7 @@ class DefaultController extends AbstractController
     #[Route('/delete/{id}', name: 'delete_tracker', methods: ['POST', 'DELETE'])]
     public function delete(int $id, EntityManagerInterface $entityManager): Response
     {
-        $entry = $entityManager->getRepository(StoryTracker::class)->find($id);
+        $entry = $entityManager->getRepository(Story::class)->find($id);
 
         if (!$entry) {
             throw $this->createNotFoundException('Entry not found.');
