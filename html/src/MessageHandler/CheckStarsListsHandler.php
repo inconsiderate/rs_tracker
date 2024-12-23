@@ -3,7 +3,9 @@
 namespace App\MessageHandler;
 
 use App\Entity\Story;
+use App\Entity\RSMatch;
 use App\Message\CheckStarsLists;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,85 +21,143 @@ final class CheckStarsListsHandler
 
     public function __invoke(CheckStarsLists $message): void
     {
-        $this->logger->notice('>>>> Generating arrays for Rising Stars checks...');
+        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Starting Rising Stars checks...');
 
+        // Fetch stories and initialize genre map
         $storys = $this->entityManager->getRepository(Story::class)->findAll();
         $storyGenreMap = [];
         $allStories = [];
-        
-        // Initialize the $storyGenreMap with all possible genres as keys and empty arrays as values
-        $allGenres = [
-            'adventure', 'action', 'comedy', 'contemporary', 'drama', 
-            'fantasy', 'historical', 'horror', 'mystery', 
-            'psychological', 'romance', 'satire', 'sci_fi', 
-            'one_shot', 'tragedy'
-        ];
-        
-        foreach ($allGenres as $genre) {
+    
+        foreach (Story::ALL_GENRES as $genre) {
             $storyGenreMap[$genre] = [];
         }
-        
-        // Populate the $storyGenreMap
+    
         foreach ($storys as $story) {
-            $storyName = $story->getStoryName();
-            // Add this story to the main list, if it's not already there
-            if (!in_array($storyName, $allStories, true)) {
-                $allStories[] = $storyName;
-            }
-
-            $genres = $story->getTrackedGenres(); // Assuming this returns an array of genres
-        
-            foreach ($genres as $genre) {
+            $storyId = $story->getStoryId();
+            $allStories[] = $storyId;
+    
+            foreach ($story->getTrackedGenres() as $genre) {
                 if (isset($storyGenreMap[$genre])) {
-                    $storyGenreMap[$genre][] = $storyName;
+                    $storyGenreMap[$genre][] = $storyId;
                 }
             }
         }
-
-        $this->logger->notice('>>>> Querying Rising Stars main page...');
-
-        $urlMainPage = "https://www.royalroad.com/fictions/rising-stars";
-        $pageContent = file_get_contents($urlMainPage);
-        $foundMatches = [];
-        foreach ($allStories as $string) {
-            if (stripos($pageContent, $string) !== false) {
-                $foundMatches[] = $string;
+    
+        // Check main page
+        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Checking Rising Stars main page...');
+        $mainPageUrl = "https://www.royalroad.com/fictions/rising-stars";
+        $mainPageContent = $this->fetchPageContent($mainPageUrl);
+    
+        if ($mainPageContent) {
+            $crawler = new Crawler($mainPageContent, $mainPageUrl);
+            $matches = $this->findFictionListMatches($crawler, $allStories);
+            $this->processMatches($matches, 'main');
+        }
+    
+        // Check genre pages
+        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Checking Rising Stars genre pages...');
+        $baseGenreUrl = "https://www.royalroad.com/fictions/rising-stars?genre=";
+    
+        foreach ($storyGenreMap as $genre => $storyIds) {
+            $genreUrl = $baseGenreUrl . urlencode($genre);
+            $genrePageContent = $this->fetchPageContent($genreUrl);
+    
+            if ($genrePageContent) {
+                $crawler = new Crawler($genrePageContent, $genreUrl);
+                $matches = $this->findFictionListMatches($crawler, $storyIds);
+                $this->processMatches($matches, $genre);
             }
         }
-        
-        $this->logger->notice( "Found RS homepage matches: " . implode(', ', $foundMatches));
-
-        $foundMatches = [];
-        $this->logger->notice('>>>> Querying RR genre pages...');
-        // Search for the strings in the fetched content
-        foreach ($storyGenreMap as $genre => $searchStrings) {
-
-            // construct and hit URLs
-            $url = "https://www.royalroad.com/fictions/rising-stars?genre=" . $genre;
-            // check for matches for each genre
-            $pageContent = file_get_contents($url);
-            if ($pageContent === false) {            
-                $this->warning->notice( "Failed to fetch content from $url ");
-                die("Failed to fetch content from $url");
-            }
-
-
-            foreach ($searchStrings as $string) {
-                if (stripos($pageContent, $string) !== false) {
-                    $foundMatches[$genre][] = $string;
-                }
-            }
-        }
-
-        // Output the results
-        foreach ($foundMatches as $genre => $matches) {
-            $this->logger->notice( "Checking genre list: $genre");
-            $this->logger->notice( "Found matches: " . implode(', ', $matches));
-        }
-
-        
-        $this->logger->notice( ">>>> Scheduled Checks Complete <<<< ");
+    
+        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . ">>>> Rising Stars checks complete. <<<<");
     }
-
+    
+    private function fetchPageContent($url)
+    {
+        $content = @file_get_contents($url);
+        if ($content === false) {
+            $this->logger->error((new \DateTime())->format('Y-m-d H:i:s') . "Failed to fetch content from {$url}");
+        }
+        return $content;
+    }
+    
+    private function findFictionListMatches($crawler, $storyIds)
+    {
+        $matches = [];
+        $crawler->filter('.fiction-list .fiction-list-item')->each(function (Crawler $node, $position) use ($storyIds, &$matches) {
+            $link = $node->filter('a')->link();
+            foreach ($storyIds as $storyId) {
+                if (strpos($link->getUri(), '/fiction/' . $storyId) !== false) {
+                    $matches[] = ['storyId' => $storyId, 'position' => $position + 1];
+                }
+            }
+        });
+        return $matches;
+    }
+    
+    private function processMatches($matches, $genre)
+    {
+        $storyIds = array_column($matches, 'storyId');
+        $existingStories = $this->entityManager->getRepository(Story::class)
+            ->createQueryBuilder('s')
+            ->where('s.storyId IN (:ids)')
+            ->setParameter('ids', $storyIds)
+            ->getQuery()
+            ->getResult();
+    
+        $existingStoriesMap = [];
+        foreach ($existingStories as $story) {
+            $existingStoriesMap[$story->getStoryId()] = $story;
+        }
+    
+        $newEntries = [];
+        foreach ($matches as $match) {
+            $storyId = $match['storyId'];
+            $position = $match['position'];
+    
+            if (!isset($existingStoriesMap[$storyId])) {
+                $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . "Story ID {$storyId} found in matches but does not exist in the database. Skipping.");
+                continue;
+            }
+    
+            $storyEntity = $existingStoriesMap[$storyId];
+            $existingEntry = $this->entityManager->getRepository(RSMatch::class)
+                ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
+    
+            if ($existingEntry) {
+                if ($existingEntry->getHighestPosition() > $position) {
+                    $existingEntry->setHighestPosition($position);
+                }
+            } else {
+                $newEntry = new RSMatch();
+                $newEntry->setStoryID($storyEntity);
+                $newEntry->setGenre($genre);
+                $newEntry->setHighestPosition($position);
+                $newEntry->setDate(new \DateTime());
+                $newEntry->setActive(1);
+                $newEntries[] = $newEntry;
+            }
+        }
+    
+        foreach ($newEntries as $entry) {
+            $this->entityManager->persist($entry);
+        }
+    
+        $activeEntries = $this->entityManager->getRepository(RSMatch::class)
+            ->findBy(['active' => 1, 'genre' => $genre]);
+    
+        $this->deactivateUnmatchedEntries($activeEntries, $storyIds, $genre);
+        $this->entityManager->flush();
+    }
+    
+    private function deactivateUnmatchedEntries($activeEntries, $matchedIds, $genre)
+    {
+        foreach ($activeEntries as $entry) {
+            if (!in_array($entry->getStoryID()->getStoryId(), $matchedIds)) {
+                $entry->setActive(0);
+                $entry->setRemovedDate(new \DateTime());
+            }
+        }
+    }
 
 }

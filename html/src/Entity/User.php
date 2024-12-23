@@ -35,25 +35,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    /**
-     * @var Collection<int, RSMatch>
-     */
-    #[ORM\OneToMany(targetEntity: RSMatch::class, mappedBy: 'userID', orphanRemoval: true)]
-    private Collection $rSMatches;
-
     #[ORM\Column]
     private bool $isVerified = false;
 
     /**
      * @var Collection<int, Story>
      */
-    #[ORM\OneToMany(targetEntity: Story::class, mappedBy: 'UserStories', orphanRemoval: true)]
-    private Collection $storys;
+    #[ORM\ManyToMany(targetEntity: Story::class, mappedBy: 'users')]
+    private Collection $stories;
 
     public function __construct()
     {
-        $this->rSMatches = new ArrayCollection();
-        $this->storys = new ArrayCollection();
+        $this->stories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,36 +124,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection<int, RSMatch>
-     */
-    public function getRSMatches(): Collection
-    {
-        return $this->rSMatches;
-    }
-
-    public function addRSMatch(RSMatch $rSMatch): static
-    {
-        if (!$this->rSMatches->contains($rSMatch)) {
-            $this->rSMatches->add($rSMatch);
-            $rSMatch->setUserID($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRSMatch(RSMatch $rSMatch): static
-    {
-        if ($this->rSMatches->removeElement($rSMatch)) {
-            // set the owning side to null (unless already changed)
-            if ($rSMatch->getUserID() === $this) {
-                $rSMatch->setUserID(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function isVerified(): bool
     {
         return $this->isVerified;
@@ -176,16 +139,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Story>
      */
-    public function getStorys(): Collection
+    public function getStories(): Collection
     {
-        return $this->storys;
+        return $this->stories;
     }
 
     public function addStory(Story $story): static
     {
-        if (!$this->storys->contains($story)) {
-            $this->storys->add($story);
-            $story->setUserStories($this);
+        if (!$this->stories->contains($story)) {
+            $this->stories->add($story);
+            $story->addUser($this);
         }
 
         return $this;
@@ -193,11 +156,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeStory(Story $story): static
     {
-        if ($this->storys->removeElement($story)) {
-            // set the owning side to null (unless already changed)
-            if ($story->getUserStories() === $this) {
-                $story->setUserStories(null);
-            }
+        if ($this->stories->removeElement($story)) {
+            $story->removeUser($this);
         }
 
         return $this;

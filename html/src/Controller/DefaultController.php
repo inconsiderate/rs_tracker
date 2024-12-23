@@ -58,6 +58,11 @@ class DefaultController extends AbstractController
 
         if ($storyForm->isSubmitted() && $storyForm->isValid()) {   
             $storyUrl = $request->request->all('story')['storyName'];
+            if (preg_match('/\/fiction\/(\d+)\//', $storyUrl, $matches)) {
+                $storyId = $matches[1];
+            } else {
+                $this->addFlash('error', 'Error: No ID was found in the supplied URL');
+            }
 
             $htmlContent = file_get_contents($storyUrl);
             if ($htmlContent === false) {
@@ -74,9 +79,10 @@ class DefaultController extends AbstractController
                 $this->addFlash('error', 'Error: Both Name and at least one Genre must be selected');
                 return $this->redirectToRoute('app_trackers');
             }
-            // Set the logged-in user as the UserStories for the Story
-            $story->setUserStories($user);
+            // Set the logged-in user as the User for the Story
+            $story->addUser($user);
             $story->setStoryName($storyName);
+            $story->setStoryId($storyId);
             $story->setStoryAddress($storyUrl);
             $story->setTrackedGenres($trackedGenres);
     
@@ -84,7 +90,6 @@ class DefaultController extends AbstractController
             $entityManager->persist($story);
             $entityManager->flush();
 
-            // Redirect to another page (for example, the same profile page after saving)
             return $this->redirectToRoute('app_trackers');
         }
 
@@ -107,7 +112,7 @@ class DefaultController extends AbstractController
 
         // ensure this Story belongs to the logged in user
         $currentUser = $this->getUser();
-        if ($currentUser->getId() == $entry->getUserStories()->getId()){        
+        if ($currentUser->getId() == $entry->getUsers()->getId()){        
             $entityManager->remove($entry);
             $entityManager->flush();
         } else {

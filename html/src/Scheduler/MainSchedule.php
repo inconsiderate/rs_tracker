@@ -20,7 +20,7 @@ final class MainSchedule implements ScheduleProviderInterface
     public function getSchedule(): Schedule
     {
         if ($_SERVER['APP_ENV'] == 'dev') {
-            $freq = '15 seconds';
+            $freq = '30 seconds';
         } else {
             $freq = '15 minutes';
         }

@@ -11,6 +11,40 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: StoryRepository::class)]
 class Story
 {
+    public const ADVENTURE = 'adventure';
+    public const ACTION = 'action';
+    public const COMEDY = 'comedy';
+    public const CONTEMPORARY = 'contemporary';
+    public const DRAMA = 'drama';
+    public const FANTASY = 'fantasy';
+    public const HISTORICAL = 'historical';
+    public const HORROR = 'horror';
+    public const MYSTERY = 'mystery';
+    public const PSYCHOLOGICAL = 'psychological';
+    public const ROMANCE = 'romance';
+    public const SATIRE = 'satire';
+    public const SCI_FI = 'sci_fi';
+    public const ONE_SHOT = 'one_shot';
+    public const TRAGEDY = 'tragedy';
+
+    public const ALL_GENRES = [
+        self::ADVENTURE,
+        self::ACTION,
+        self::COMEDY,
+        self::CONTEMPORARY,
+        self::DRAMA,
+        self::FANTASY,
+        self::HISTORICAL,
+        self::HORROR,
+        self::MYSTERY,
+        self::PSYCHOLOGICAL,
+        self::ROMANCE,
+        self::SATIRE,
+        self::SCI_FI,
+        self::ONE_SHOT,
+        self::TRAGEDY,
+    ];
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -28,19 +62,22 @@ class Story
     #[ORM\OneToMany(targetEntity: RSMatch::class, mappedBy: 'storyID', orphanRemoval: true)]
     private Collection $rSMatches;
 
-    #[ORM\ManyToOne(inversedBy: 'storys')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $UserStories = null;
-
     #[ORM\Column(length: 255)]
     private ?string $storyAddress = null;
 
     #[ORM\Column]
     private ?int $storyId = null;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'stories')]
+    private Collection $users;
+
     public function __construct()
     {
         $this->rSMatches = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,18 +139,6 @@ class Story
         return $this;
     }
 
-    public function getUserStories(): ?User
-    {
-        return $this->UserStories;
-    }
-
-    public function setUserStories(?User $UserStories): static
-    {
-        $this->UserStories = $UserStories;
-
-        return $this;
-    }
-
     public function getStoryAddress(): ?string
     {
         return $this->storyAddress;
@@ -134,6 +159,30 @@ class Story
     public function setStoryId(int $storyId): static
     {
         $this->storyId = $storyId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->users->removeElement($user);
 
         return $this;
     }

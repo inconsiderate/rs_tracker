@@ -12,6 +12,6 @@
   
 
 ## run the checker, locally
-- `html\src\Scheduler\MainSchedule.php` frequency is set to 15 seconds but you can change this locally if you want
+- `html\src\Scheduler\MainSchedule.php` frequency is set to 30 seconds but you can change this locally if you want
 - `docker exec -it rs_tracker_app sh -c "php bin/console messenger:consume -v scheduler_listCheck"`
-- make sure to ctrl+c to stop the process after it runs once. You don't want to let it keep going every 15s
+- make sure to ctrl+c to stop the process after it runs once. You don't want to let it keep going every 30s

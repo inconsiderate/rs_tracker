@@ -16,33 +16,26 @@ class RSMatch
 
     #[ORM\ManyToOne(inversedBy: 'rSMatches')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $userID = null;
-
-    #[ORM\ManyToOne(inversedBy: 'rSMatches')]
-    #[ORM\JoinColumn(nullable: false)]
     private ?Story $storyID = null;
-
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $listPosition = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column]
+    private ?bool $active = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $highestPosition = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $genre = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $removedDate = null;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUserID(): ?User
-    {
-        return $this->userID;
-    }
-
-    public function setUserID(?User $userID): static
-    {
-        $this->userID = $userID;
-
-        return $this;
     }
 
     public function getStoryID(): ?Story
@@ -57,18 +50,6 @@ class RSMatch
         return $this;
     }
 
-    public function getListPosition(): ?int
-    {
-        return $this->listPosition;
-    }
-
-    public function setListPosition(int $listPosition): static
-    {
-        $this->listPosition = $listPosition;
-
-        return $this;
-    }
-
     public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
@@ -77,6 +58,54 @@ class RSMatch
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    public function getHighestPosition(): ?int
+    {
+        return $this->highestPosition;
+    }
+
+    public function setHighestPosition(?int $highestPosition): static
+    {
+        $this->highestPosition = $highestPosition;
+
+        return $this;
+    }
+
+    public function getGenre(): ?string
+    {
+        return $this->genre;
+    }
+
+    public function setGenre(string $genre): static
+    {
+        $this->genre = $genre;
+
+        return $this;
+    }
+
+    public function getRemovedDate(): ?\DateTimeInterface
+    {
+        return $this->removedDate;
+    }
+
+    public function setRemovedDate(?\DateTimeInterface $removedDate): static
+    {
+        $this->removedDate = $removedDate;
 
         return $this;
     }
