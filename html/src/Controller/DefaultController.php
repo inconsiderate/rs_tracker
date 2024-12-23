@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Story;
+use App\Entity\RSMatch;
 use App\Form\StoryFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,9 +15,34 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function app_home(): Response
+    public function app_home(EntityManagerInterface $entityManager): Response
     {
-        return $this->render('homepage.html.twig');
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->render('homepage.html.twig');
+        }
+
+        // get user data for page view
+        $activeEntries = $entityManager->getRepository(RSMatch::class)
+            ->findByUser($user);
+
+        $data = [];
+        foreach ($activeEntries as $entry) {
+            $data[] = [
+                'storyName' => $entry->getStoryID()->getStoryName(),
+                'date' => $entry->getDate(),
+                'genre' => $entry->getGenre(),
+                'highestPosition' => $entry->getHighestPosition(),
+                'timeOnList' => $entry->getTimeOnList(),
+                'active' => $entry->isActive(),
+            ];
+        }
+
+        // Render the form view
+        return $this->render('homepage.html.twig', [
+            'data' => $data,
+        ]);
     }
 
 

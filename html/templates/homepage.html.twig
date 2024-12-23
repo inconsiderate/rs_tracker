@@ -7,58 +7,38 @@
 
 <div class="card-group support">
     <div class="card ">
-        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         <div class="card-body">
-            <h5 class="card-title text-center">Your Stars History</h5>
+            <h2 class="card-title text-center">Your Stars History</h2>
             <div class="card-text">
-                <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Story Title</th>
-                        <th scope="col">RS List</th>
-                        <th scope="col">Consecutive<br/>Time on RS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Dec 20, 2024</th>
-                        <td>The Isekai Police- LitRPG | OP Protagonist</td>
-                        <td>Main Page</td>
-                        <td>9 hours <i class="fa fa-star"></i></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Dec 19, 2024</th>
-                        <td>A Duke Out of Time (LITRPG Weak to Strong MC/Dungeon Delving Loot Adventure)</td>
-                        <td>Action</td>
-                        <td>14 days <i class="fa fa-star"></i></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Dec 17, 2024</th>
-                        <td>The Isekai Police- LitRPG | OP Protagonist</td>
-                        <td>Main Page</td>
-                        <td>6 hours</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Dec 17, 2024</th>
-                        <td>The Isekai Police- LitRPG | OP Protagonist</td>
-                        <td>Adventure</td>
-                        <td>15 minutes</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Dec 2, 2024</th>
-                        <td>A Duke Out of Time (LITRPG Weak to Strong MC/Dungeon Delving Loot Adventure)</td>
-                        <td>Action</td>
-                        <td>13 hours</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <th scope="row" colspan="4"><i class="fa fa-star"></i> = this title is currently on the list!</th>
-                </tfoot>
-            </table>
-
+                <table class="table" id="matchTable">
+                    <thead>
+                        <tr>
+                            <th>Entered List</th>
+                            <th>Story Title</th>
+                            <th>RS List</th>
+                            <th>Highest Position</th>
+                            <th>Consecutive<br/>Time on RS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data %}
+                        <tr>
+                            <td>{{item.date|date("m/d/Y H:i")}}</td>
+                            <td>{{item.storyName}}</td>
+                            <td>{{item.genre}}</td>
+                            <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
+                            <td>{{item.timeOnList}} </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on the list!</td>
+                    </tfoot>
+                </table>
+            </div>
         </div>
-        {% else %}
+    {% else %}
         <div class="card-body">
             <h1 class="card-title">Rising Stars Tracker [Meta-Analytics, Reincarnation]</h1>
             <ul class="list-inline">
@@ -68,7 +48,7 @@
                 <li class="list-inline-item"><i class="fa-solid fa-pen-fancy"></i> Meta-Writing</li>
                 <li class="list-inline-item"><i class="fa-solid fa-face-dizzy"></i> Why Isn't My Story Trending?!</li>
             </ul>
-<hr>
+            <hr>
             <p>Quietly walking home one day after work, Rising Stars was unexpectedly hit by a truck! Now they've awakened in a strange new world, a world made up of lists and genres and wordsmiths of every size and shape. Granted the powerful unique class 'Tracker', the newly christened Rising Stars Tracker (version 0.1) will need to adapt (and push out new versions) if they hope to survive! Armed with nothing but their own will to write, and a desire to climb the genre lists, Rising Stars Tracker vows to defeat the evil Queen Procrastination and come out on top!</p>
 
             <p class="mb-0"><strong>What You Can Expect:</strong></p>
@@ -91,8 +71,16 @@
             <img src="{{ asset('images/helpyou.jpg') }}" class="card-img-top mx-auto" alt="...Help you.">
 
         </div>
-        {% endif %}
+    {% endif %}
     </div>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $('#matchTable').DataTable({
+            pageLength: 50
+        });
+    </script>
 {% endblock %}

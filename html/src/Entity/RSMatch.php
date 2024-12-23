@@ -109,4 +109,34 @@ class RSMatch
 
         return $this;
     }
+
+    public function getTimeOnList(): ?string
+    {
+        $endDate = $this->removedDate;
+        if (!$endDate) {
+            $endDate = new \DateTime();
+        }
+    
+        $interval = $this->date->diff($endDate);
+    
+        // Build the output string based on the available parts
+        $parts = [];
+        if ($interval->d > 0) {
+            $parts[] = $interval->d . ' day' . ($interval->d > 1 ? 's' : '');
+        }
+        if ($interval->h > 0) {
+            $parts[] = $interval->h . ' hour' . ($interval->h > 1 ? 's' : '');
+        }
+        if ($interval->i > 0) {
+            $parts[] = $interval->i . ' minute' . ($interval->i > 1 ? 's' : '');
+        }
+    
+        // If no days, hours, or minutes, fall back to seconds
+        if (empty($parts) && $interval->s > 0) {
+            $parts[] = $interval->s . ' second' . ($interval->s > 1 ? 's' : '');
+        }
+    
+        // Join the parts with a space
+        return implode(' ', $parts);
+    }
 }
