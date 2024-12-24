@@ -51,9 +51,6 @@ class DefaultController extends AbstractController
     {
         return $this->render('support.html.twig');
     }
-
-
-
     
     // create a new story and display existing stories
     #[Route('/trackers', name: 'app_trackers')]
@@ -65,23 +62,11 @@ class DefaultController extends AbstractController
             throw $this->createAccessDeniedException('You must be logged in to access this functionality.');
         }
 
-        // get data for page view
-        $stories = $entityManager->getRepository(Story::class)->findAll();
-        $data = [];
-        foreach ($stories as $story) {
-            $data[] = [
-                'storyName' => $story->getStoryName(),
-                'trackedGenres' => $story->getTrackedGenres(),
-                'id' => $story->getId(),
-            ];
-        }
-
-
         // Create a new Story instance
         $story = new Story();
         $storyForm = $this->createForm(StoryFormType::class, $story);
         $storyForm->handleRequest($request);
-
+        
         if ($storyForm->isSubmitted() && $storyForm->isValid()) {   
             $storyUrl = $request->request->all('story')['storyName'];
             if (preg_match('/\/fiction\/(\d+)\//', $storyUrl, $matches)) {
@@ -90,35 +75,52 @@ class DefaultController extends AbstractController
                 $this->addFlash('error', 'Error: No ID was found in the supplied URL');
             }
 
-            $htmlContent = file_get_contents($storyUrl);
-            if ($htmlContent === false) {
-                $this->addFlash('error', 'Error: No content was found at the supplied URL');
-                return $this->redirectToRoute('app_trackers');
-            }
-            
-            $crawler = new Crawler($htmlContent);
-            $storyName = $crawler->filter('.fic-title h1')->text();
+            $fetchedStory = $entityManager->getRepository(Story::class)->findOneByStoryId($storyId);
+            if ($fetchedStory) {
+                //story already exists in the DB, add this user to it and we're done
+                $fetchedStory->addUser($user);
+                $entityManager->persist($fetchedStory);
+            } else {
+                $htmlContent = file_get_contents($storyUrl);
+                if ($htmlContent === false) {
+                    $this->addFlash('error', 'Error: No content was found at the supplied URL');
+                    return $this->redirectToRoute('app_trackers');
+                }
+                
+                $crawler = new Crawler($htmlContent);
+                $storyName = $crawler->filter('.fic-title h1')->text();
 
-            $trackedGenres = isset($request->request->all('story')['trackedGenres']) ? $request->request->all('story')['trackedGenres'] : null;
-
-            if (!$storyName || !$trackedGenres){
-                $this->addFlash('error', 'Error: Both Name and at least one Genre must be selected');
-                return $this->redirectToRoute('app_trackers');
+                if (!$storyName){
+                    return $this->redirectToRoute('app_trackers');
+                }
+                // Set the logged-in user as the User for the Story
+                $story->addUser($user);
+                $story->setStoryName($storyName);
+                $story->setStoryId($storyId);
+                $story->setStoryAddress($storyUrl);
+                $entityManager->persist($story);
             }
-            // Set the logged-in user as the User for the Story
-            $story->addUser($user);
-            $story->setStoryName($storyName);
-            $story->setStoryId($storyId);
-            $story->setStoryAddress($storyUrl);
-            $story->setTrackedGenres($trackedGenres);
-    
-            // Persist the Story entity
-            $entityManager->persist($story);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_trackers');
         }
 
+        // fetch stories assigned to this user
+        $stories = $entityManager->getRepository(Story::class)->createQueryBuilder('s')
+            ->innerJoin('s.users', 'u')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+        ->getResult();
+
+        $data = [];
+        foreach ($stories as $story) {
+            $data[] = [
+                'storyName' => $story->getStoryName(),
+                'id' => $story->getId(),
+            ];
+        }
+        
         // Render the form view
         return $this->render('trackers.html.twig', [
             'form' => $storyForm->createView(),
@@ -126,24 +128,19 @@ class DefaultController extends AbstractController
         ]);
     }
 
-
     #[Route('/delete/{id}', name: 'delete_tracker', methods: ['POST', 'DELETE'])]
     public function delete(int $id, EntityManagerInterface $entityManager): Response
     {
-        $entry = $entityManager->getRepository(Story::class)->find($id);
-
-        if (!$entry) {
-            throw $this->createNotFoundException('Entry not found.');
+        // Check if the user is logged in
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('You must be logged in to access this functionality.');
         }
 
-        // ensure this Story belongs to the logged in user
-        $currentUser = $this->getUser();
-        if ($currentUser->getId() == $entry->getUsers()->getId()){        
-            $entityManager->remove($entry);
-            $entityManager->flush();
-        } else {
-            $this->addFlash('error', "Error: Cannot delete entries that don't belong to you");
-        }
+        $fetchedStory = $entityManager->getRepository(Story::class)->findOneById($id);
+        $user->removeStory($fetchedStory);
+        $entityManager->persist($user);
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_trackers');
     }

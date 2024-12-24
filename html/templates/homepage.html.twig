@@ -8,8 +8,8 @@
 <div class="card-group support">
     <div class="card ">
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <h2 class="card-title p-3 text-center">Your Stars History</h2>
         <div class="card-body">
-            <h2 class="card-title text-center">Your Stars History</h2>
             <div class="card-text">
                 <table class="table" id="matchTable">
                     <thead>
@@ -40,7 +40,7 @@
         </div>
     {% else %}
         <div class="card-body">
-            <h1 class="card-title">Rising Stars Tracker [Meta-Analytics, Reincarnation]</h1>
+            <h1 class="card-title p-3">Rising Stars Tracker [Meta-Analytics, Reincarnation]</h1>
             <ul class="list-inline">
                 <li><strong>Genres:</strong></li>
                 <li class="list-inline-item"><i class="fa-solid fa-shield-halved"></i> Survival Drama</li>

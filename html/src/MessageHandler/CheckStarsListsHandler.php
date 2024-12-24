@@ -28,7 +28,7 @@ final class CheckStarsListsHandler
         $storyGenreMap = [];
         $allStories = [];
     
-        foreach (Story::ALL_GENRES as $genre) {
+        foreach (RSMatch::ALL_GENRES as $genre) {
             $storyGenreMap[$genre] = [];
         }
     
@@ -36,39 +36,38 @@ final class CheckStarsListsHandler
             $storyId = $story->getStoryId();
             $allStories[] = $storyId;
     
-            foreach ($story->getTrackedGenres() as $genre) {
-                if (isset($storyGenreMap[$genre])) {
-                    $storyGenreMap[$genre][] = $storyId;
-                }
+            // Check all genres for the story
+            foreach (RSMatch::ALL_GENRES as $genre) {
+                $storyGenreMap[$genre][] = $storyId;
             }
         }
-    
         // Check main page
         $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Checking Rising Stars main page...');
         $mainPageUrl = "https://www.royalroad.com/fictions/rising-stars";
         $mainPageContent = $this->fetchPageContent($mainPageUrl);
-    
+        
         if ($mainPageContent) {
             $crawler = new Crawler($mainPageContent, $mainPageUrl);
             $matches = $this->findFictionListMatches($crawler, $allStories);
             $this->processMatches($matches, 'main');
         }
-    
+        
         // Check genre pages
         $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Checking Rising Stars genre pages...');
         $baseGenreUrl = "https://www.royalroad.com/fictions/rising-stars?genre=";
-    
-        foreach ($storyGenreMap as $genre => $storyIds) {
+        
+        foreach (RSMatch::ALL_GENRES as $genre) {
             $genreUrl = $baseGenreUrl . urlencode($genre);
             $genrePageContent = $this->fetchPageContent($genreUrl);
-    
+        
             if ($genrePageContent) {
                 $crawler = new Crawler($genrePageContent, $genreUrl);
-                $matches = $this->findFictionListMatches($crawler, $storyIds);
+                // Pass $allStories to check all stories for the current genre
+                $matches = $this->findFictionListMatches($crawler, $allStories);
                 $this->processMatches($matches, $genre);
             }
         }
-    
+        
         $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . ">>>> Rising Stars checks complete. <<<<");
     }
     

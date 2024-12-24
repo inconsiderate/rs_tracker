@@ -17,34 +17,6 @@ class StoryFormType extends AbstractType
         $builder
             ->add('storyName', TextType::class, [
                 'label' => 'Story Name',
-            ])
-            ->add('trackedGenres', CollectionType::class, [
-                'entry_type' => ChoiceType::class,  // Use ChoiceType for select options
-                'entry_options' => [
-                    'choices' => [
-                        'Action' => 'action',
-                        'Adventure' => 'adventure',
-                        'Comedy' => 'comedy',
-                        'Contemporary' => 'contemporary',
-                        'Drama' => 'drama',
-                        'Fantasy' => 'fantasy',
-                        'Historical' => 'historical',
-                        'Horror' => 'horror',
-                        'Mystery' => 'mystery',
-                        'Psychological' => 'psychological',
-                        'Romance' => 'romance',
-                        'Satire' => 'satire',
-                        'Sci-fi' => 'sci_fi',
-                        'Short Story' => 'one_shot',
-                        'Tragedy' => 'tragedy',
-                    ],
-                    'multiple' => true,  // Allow multiple selections
-                    'expanded' => false, // Use a dropdown rather than checkboxes
-                ],
-                'allow_add' => true, // Allow adding genres
-                'allow_delete' => true, // Allow deleting genres
-                'by_reference' => false, // Ensure it works correctly with the array
-                'label' => 'Tracked Genres',
             ]);
     }
 

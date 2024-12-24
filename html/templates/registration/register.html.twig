@@ -24,8 +24,8 @@
             {{ form_start(registrationForm) }}
                 <label for="username">Email Address</label>
                 <input type="text" value="{{ field_value(registrationForm.username) }}" name="{{ field_name(registrationForm.username) }}" id="{{ field_name(registrationForm.username) }}" class="form-control mb-3" autocomplete="username" required autofocus>
-                <label for="plainPassword">Password</label>
-                <input type="plainPassword" name="{{ field_name(registrationForm.plainPassword) }}" id="{{ field_name(registrationForm.plainPassword) }}" class="form-control mb-3" autocomplete="current-password" required>
+                <label for="{{ field_name(registrationForm.plainPassword) }}">Password</label>
+                <input type="password" name="{{ field_name(registrationForm.plainPassword) }}" id="{{ field_name(registrationForm.plainPassword) }}" class="form-control mb-3" autocomplete="current-password" required>
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" name="{{ field_name(registrationForm.agreeTerms) }}" type="checkbox" role="switch" id="{{ field_name(registrationForm.agreeTerms) }}">
                     <label class="form-check-label" for="{{ field_name(registrationForm.agreeTerms) }}">Agree to receive an email when your story hits the list</label>

@@ -11,40 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: StoryRepository::class)]
 class Story
 {
-    public const ADVENTURE = 'adventure';
-    public const ACTION = 'action';
-    public const COMEDY = 'comedy';
-    public const CONTEMPORARY = 'contemporary';
-    public const DRAMA = 'drama';
-    public const FANTASY = 'fantasy';
-    public const HISTORICAL = 'historical';
-    public const HORROR = 'horror';
-    public const MYSTERY = 'mystery';
-    public const PSYCHOLOGICAL = 'psychological';
-    public const ROMANCE = 'romance';
-    public const SATIRE = 'satire';
-    public const SCI_FI = 'sci_fi';
-    public const ONE_SHOT = 'one_shot';
-    public const TRAGEDY = 'tragedy';
-
-    public const ALL_GENRES = [
-        self::ADVENTURE,
-        self::ACTION,
-        self::COMEDY,
-        self::CONTEMPORARY,
-        self::DRAMA,
-        self::FANTASY,
-        self::HISTORICAL,
-        self::HORROR,
-        self::MYSTERY,
-        self::PSYCHOLOGICAL,
-        self::ROMANCE,
-        self::SATIRE,
-        self::SCI_FI,
-        self::ONE_SHOT,
-        self::TRAGEDY,
-    ];
-    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -52,9 +18,6 @@ class Story
 
     #[ORM\Column(length: 255)]
     private ?string $storyName = null;
-
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $trackedGenres = [];
 
     /**
      * @var Collection<int, RSMatch>
@@ -93,18 +56,6 @@ class Story
     public function setStoryName(string $storyName): static
     {
         $this->storyName = $storyName;
-
-        return $this;
-    }
-
-    public function getTrackedGenres(): array
-    {
-        return $this->trackedGenres;
-    }
-
-    public function setTrackedGenres(array $trackedGenres): static
-    {
-        $this->trackedGenres = $trackedGenres;
 
         return $this;
     }
