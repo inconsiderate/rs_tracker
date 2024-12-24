@@ -1,17 +1,13 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-</br>
-</br>
-</br>
-
-<div class="card-group support">
+<div class="card-group support mt-3 mt-lg-5">
     <div class="card ">
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         <h2 class="card-title p-3 text-center">Your Stars History</h2>
         <div class="card-body">
             <div class="card-text">
-                <table class="table" id="matchTable">
+                <table class="table table-responsive" id="matchTable">
                     <thead>
                         <tr>
                             <th>Entered List</th>
@@ -39,8 +35,8 @@
             </div>
         </div>
     {% else %}
+        <h1 class="card-title p-3">Rising Stars Tracker [Meta-Analytics, Reincarnation]</h1>
         <div class="card-body">
-            <h1 class="card-title p-3">Rising Stars Tracker [Meta-Analytics, Reincarnation]</h1>
             <ul class="list-inline">
                 <li><strong>Genres:</strong></li>
                 <li class="list-inline-item"><i class="fa-solid fa-shield-halved"></i> Survival Drama</li>
@@ -49,7 +45,7 @@
                 <li class="list-inline-item"><i class="fa-solid fa-face-dizzy"></i> Why Isn't My Story Trending?!</li>
             </ul>
             <hr>
-            <p>Quietly walking home one day after work, Rising Stars was unexpectedly hit by a truck! Now they've awakened in a strange new world, a world made up of lists and genres and wordsmiths of every size and shape. Granted the powerful unique class 'Tracker', the newly christened Rising Stars Tracker (version 0.1) will need to adapt (and push out new versions) if they hope to survive! Armed with nothing but their own will to write, and a desire to climb the genre lists, Rising Stars Tracker vows to defeat the evil Queen Procrastination and come out on top!</p>
+            <p>Quietly walking home one day after work, Rising Stars was unexpectedly hit by a truck! Now they've awakened in a strange new world, a world made up of lists and genres and wordsmiths of every size and shape. Granted the powerful unique class 'Tracker', the newly christened Rising Stars Tracker (version 0.1) will need to adapt (and push out new versions) if they hope to survive! Armed with nothing but their own will to write, and a desire to climb the genre lists, Rising Stars Tracker will vow to defeat the evil Queen Procrastination and come out on top!</p>
 
             <p class="mb-0"><strong>What You Can Expect:</strong></p>
             <ul>
@@ -68,7 +64,7 @@
             When you get on any Rising Stars list, it'll be tracked in the database and you'll know how long you stayed on it.<br/>
             If you fall off the list and get back on later, you'll see that too!</p>
 
-            <img src="{{ asset('images/helpyou.jpg') }}" class="card-img-top mx-auto" alt="...Help you.">
+            <img src="/assets/images/background.png" class="card-img-top mx-auto" alt="Help me...Help you.">
 
         </div>
     {% endif %}
