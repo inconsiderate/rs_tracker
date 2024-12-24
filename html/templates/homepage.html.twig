@@ -3,38 +3,6 @@
 {% block body %}
 <div class="card-group support mt-3 mt-lg-5">
     <div class="card ">
-    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-        <h2 class="card-title p-3 text-center">Your Stars History</h2>
-        <div class="card-body">
-            <div class="card-text">
-                <table class="table table-responsive" id="matchTable">
-                    <thead>
-                        <tr>
-                            <th>Entered List</th>
-                            <th>Story Title</th>
-                            <th>RS List</th>
-                            <th>Highest Position</th>
-                            <th>Consecutive<br/>Time on RS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in data %}
-                        <tr>
-                            <td>{{item.date|date("m/d/Y H:i")}}</td>
-                            <td>{{item.storyName}}</td>
-                            <td>{{item.genre}}</td>
-                            <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
-                            <td>{{item.timeOnList}} </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on the list!</td>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    {% else %}
         <h1 class="card-title p-3">Rising Stars Tracker [Meta-Analytics, Reincarnation]</h1>
         <div class="card-body">
             <ul class="list-inline">
@@ -55,7 +23,9 @@
                 <li>Because every author deserves to know when they're a star — even if it's only for 15 minutes.</li>
             </ul>
 
-            <p class="h4 text-center mt-5 mb-3">Track your rising star! <a href="/login">Login</a> or <a href="/register">Register</a> to get started!</p>
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}{% else %}
+                <p class="h4 text-center mt-5 mb-3">Track your rising star! <a href="/login">Login</a> or <a href="/register">Register</a> to get started!</p>
+            {% endif %}
 
             <h2 class="h2">What is it really?</h1>
             <p class="h5">Skip the meta-description nonsense.</p>
@@ -65,18 +35,15 @@
             If you fall off the list and get back on later, you'll see that too!</p>
 
             <img src="/assets/images/background.png" class="card-img-top mx-auto" alt="Help me...Help you.">
-
         </div>
-    {% endif %}
     </div>
 </div>
 
 {% endblock %}
 
 {% block javascripts %}
-    <script>
-        $('#matchTable').DataTable({
-            pageLength: 50
-        });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous" async></script>
+
+
+
 {% endblock %}

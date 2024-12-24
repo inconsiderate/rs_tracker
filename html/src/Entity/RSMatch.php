@@ -43,6 +43,29 @@ class RSMatch
         self::TRAGEDY,
     ];
     
+    public static function getHumanReadableName(string $genre): string
+    {
+        $genreNames = [
+            self::ADVENTURE => 'Adventure',
+            self::ACTION => 'Action',
+            self::COMEDY => 'Comedy',
+            self::CONTEMPORARY => 'Contemporary',
+            self::DRAMA => 'Drama',
+            self::FANTASY => 'Fantasy',
+            self::HISTORICAL => 'Historical',
+            self::HORROR => 'Horror',
+            self::MYSTERY => 'Mystery',
+            self::PSYCHOLOGICAL => 'Psychological',
+            self::ROMANCE => 'Romance',
+            self::SATIRE => 'Satire',
+            self::SCI_FI => 'Sci-Fi',
+            self::ONE_SHOT => 'Short Story',
+            self::TRAGEDY => 'Tragedy',
+        ];
+
+        return $genreNames[$genre] ?? $genre;
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

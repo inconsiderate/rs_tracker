@@ -17,22 +17,60 @@ class DefaultController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function app_home(EntityManagerInterface $entityManager): Response
     {
+        // $activeEntries = $entityManager->getRepository(RSMatch::class)
+        // ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
+
+        $data = [];
+        // foreach ($activeEntries as $entry) {
+        //     $data[] = [
+        //         'storyName' => $entry->getStoryID()->getStoryName(),
+        //         'date' => $entry->getDate(),
+        //         'genre' => $entry->getGenre(),
+        //         'highestPosition' => $entry->getHighestPosition(),
+        //         'timeOnList' => $entry->getTimeOnList(),
+        //         'active' => $entry->isActive(),
+        //     ];
+        // }
+
+        $genreNumberOnes = [];
+        $mainNumberOne = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne('main');
+        foreach (RSMatch::ALL_GENRES as $genre) {
+            $item = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne($genre);        
+            $genreNumberOnes[$genre]['name'] = $item['story']->getStoryName();
+            $genreNumberOnes[$genre]['duration'] = $item['duration'];
+            $genreNumberOnes[$genre]['url'] = $item['story']->getStoryAddress();
+            $genreNumberOnes[$genre]['genre'] = RSMatch::getHumanReadableName($genre);
+        }
+
+        // Render the form view
+        return $this->render('homepage.html.twig', [
+            'main' => [
+                'name' => $mainNumberOne['story']->getStoryName(),
+                'duration' => $mainNumberOne['duration'],
+                'url' => $mainNumberOne['story']->getStoryAddress(),
+            ],
+            'numberOnes' => $genreNumberOnes
+        ]);
+    }
+
+    #[Route('/trackers', name: 'app_trackers')]
+    public function app_trackers(EntityManagerInterface $entityManager): Response
+    {
         $user = $this->getUser();
 
         if (!$user) {
-            return $this->render('homepage.html.twig');
+            throw $this->createAccessDeniedException('You must be logged in to access this functionality.');
         }
 
         // get user data for page view
-        $activeEntries = $entityManager->getRepository(RSMatch::class)
-            ->findByUser($user);
+        $activeEntries = $entityManager->getRepository(RSMatch::class)->findByUser($user);
 
         $data = [];
         foreach ($activeEntries as $entry) {
             $data[] = [
                 'storyName' => $entry->getStoryID()->getStoryName(),
                 'date' => $entry->getDate(),
-                'genre' => $entry->getGenre(),
+                'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
                 'highestPosition' => $entry->getHighestPosition(),
                 'timeOnList' => $entry->getTimeOnList(),
                 'active' => $entry->isActive(),
@@ -40,7 +78,7 @@ class DefaultController extends AbstractController
         }
 
         // Render the form view
-        return $this->render('homepage.html.twig', [
+        return $this->render('trackers.html.twig', [
             'data' => $data,
         ]);
     }
@@ -53,8 +91,8 @@ class DefaultController extends AbstractController
     }
     
     // create a new story and display existing stories
-    #[Route('/trackers', name: 'app_trackers')]
-    public function app_trackers(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/trackers/edit', name: 'app_trackers_edit')]
+    public function app_trackers_edit(Request $request, EntityManagerInterface $entityManager): Response
     {
         // Check if the user is logged in
         $user = $this->getUser();
@@ -84,14 +122,14 @@ class DefaultController extends AbstractController
                 $htmlContent = file_get_contents($storyUrl);
                 if ($htmlContent === false) {
                     $this->addFlash('error', 'Error: No content was found at the supplied URL');
-                    return $this->redirectToRoute('app_trackers');
+                    return $this->redirectToRoute('app_trackers_edit');
                 }
                 
                 $crawler = new Crawler($htmlContent);
                 $storyName = $crawler->filter('.fic-title h1')->text();
 
                 if (!$storyName){
-                    return $this->redirectToRoute('app_trackers');
+                    return $this->redirectToRoute('app_trackers_edit');
                 }
                 // Set the logged-in user as the User for the Story
                 $story->addUser($user);
@@ -102,7 +140,7 @@ class DefaultController extends AbstractController
             }
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_trackers');
+            return $this->redirectToRoute('app_trackers_edit');
         }
 
         // fetch stories assigned to this user
@@ -122,7 +160,7 @@ class DefaultController extends AbstractController
         }
         
         // Render the form view
-        return $this->render('trackers.html.twig', [
+        return $this->render('edit_trackers.html.twig', [
             'form' => $storyForm->createView(),
             'data' => $data,
         ]);
@@ -142,6 +180,6 @@ class DefaultController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return $this->redirectToRoute('app_trackers');
+        return $this->redirectToRoute('app_trackers_edit');
     }
 }

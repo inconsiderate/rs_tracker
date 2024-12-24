@@ -32,9 +32,9 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="/">Tracker Results</a>
+                        <a class="nav-link" aria-current="page" href="/trackers">Tracker Results</a>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                        <a class="nav-link" href="/trackers">Trackers</a>
+                        <a class="nav-link" href="/trackers/edit">Edit Trackers</a>
                         {% endif %}
                         <a class="nav-link" href="/support">Support</a>
                     </div>
@@ -50,7 +50,10 @@
                     <ul class="navbar-nav">
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/trackers">Trackers</a>
+                            <a class="nav-link" aria-current="page" href="/trackers">Tracker Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/trackers/edit">Edit Trackers</a>
                         </li>
                         {% endif %}
                         <li class="nav-item">
