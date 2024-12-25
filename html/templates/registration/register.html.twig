@@ -13,7 +13,7 @@
                 <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
             {% endfor %}
 
-            <h1 class="h1 mb-3 font-weight-normal">Register</h1>
+            <h1 class="h1 mb-3 font-weight-normal">Register <span class="h6">or <a href="/login">Sign In</a></span></h1>
 
             {{ form_errors(registrationForm) }}
 
@@ -23,7 +23,7 @@
                 <label for="{{ field_name(registrationForm.plainPassword) }}">Password</label>
                 <input type="password" name="{{ field_name(registrationForm.plainPassword) }}" id="{{ field_name(registrationForm.plainPassword) }}" class="form-control mb-3" autocomplete="current-password" required>
                 <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" name="{{ field_name(registrationForm.agreeTerms) }}" type="checkbox" role="switch" id="{{ field_name(registrationForm.agreeTerms) }}">
+                    <input required class="form-check-input" name="{{ field_name(registrationForm.agreeTerms) }}" type="checkbox" role="switch" id="{{ field_name(registrationForm.agreeTerms) }}">
                     <label class="form-check-label" for="{{ field_name(registrationForm.agreeTerms) }}">Agree to receive an email when your story hits the list</label>
                 </div>
                 <button type="submit" class="btn btn-lg btn-primary">Register</button>
