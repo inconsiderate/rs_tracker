@@ -15,3 +15,7 @@
 - `html\src\Scheduler\MainSchedule.php` frequency is set to 30 seconds but you can change this locally if you want
 - `docker exec -it rs_tracker_app sh -c "php bin/console messenger:consume -v scheduler_listCheck"`
 - make sure to ctrl+c to stop the process after it runs once. You don't want to let it keep going every 30s
+
+## crons
+- update all the current story positions: */30	*	*	*	*
+  - `cd /home/royahjos/ && /usr/local/bin/php /home/royahjos/bin/console app:dispatch-check-stars-lists >> /home/royahjos/logs/messenger.log`
