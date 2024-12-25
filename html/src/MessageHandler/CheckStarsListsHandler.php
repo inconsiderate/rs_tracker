@@ -19,9 +19,9 @@ final class CheckStarsListsHandler
         $this->entityManager = $entityManager;
     }
 
-    public function __invoke(CheckStarsLists $message): void
+    public function __invoke(CheckStarsLists $message)
     {
-        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Starting Rising Stars checks...');
+        echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Starting Rising Stars checks...' . PHP_EOL;
         $storyGenreMap = [];
         $allStories = [];
         
@@ -30,7 +30,7 @@ final class CheckStarsListsHandler
         }
         
         // Check main page
-        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Checking Rising Stars main page...');
+        // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars main page...' . PHP_EOL;
         $mainPageUrl = "https://www.royalroad.com/fictions/rising-stars";
         $mainPageContent = $this->fetchPageContent($mainPageUrl);
 
@@ -39,7 +39,7 @@ final class CheckStarsListsHandler
 
 
         // Check genre pages
-        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . '>>>> Checking Rising Stars genre pages...');
+        // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars genre pages...' . PHP_EOL;
         $baseGenreUrl = "https://www.royalroad.com/fictions/rising-stars?genre=";
         
         foreach (RSMatch::ALL_GENRES as $genre) {
@@ -51,7 +51,7 @@ final class CheckStarsListsHandler
 
         }
         
-        $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . ">>>> Rising Stars checks complete. <<<<");
+        echo (new \DateTime())->format('Y-m-d H:i:s') . " >>>> Rising Stars checks complete." . PHP_EOL;
     }
     
     private function verifyStoriesExist($pageContent, $pageUrl)
@@ -78,7 +78,7 @@ final class CheckStarsListsHandler
     {
         $content = @file_get_contents($url);
         if ($content === false) {
-            $this->logger->error((new \DateTime())->format('Y-m-d H:i:s') . "Failed to fetch content from {$url}");
+            echo (new \DateTime())->format('Y-m-d H:i:s') . " Failed to fetch content from {$url}" . PHP_EOL;
         }
         return $content;
     }
@@ -111,6 +111,7 @@ final class CheckStarsListsHandler
     
     private function processMatches($matches, $genre)
     {
+        // echo (new \DateTime())->format('Y-m-d H:i:s') . " Processing matches..." . PHP_EOL;
         $storyIds = array_column($matches, 'storyId');
         $existingStories = $this->entityManager->getRepository(Story::class)
             ->createQueryBuilder('s')
@@ -130,7 +131,7 @@ final class CheckStarsListsHandler
             $position = $match['position'];
     
             if (!isset($existingStoriesMap[$storyId])) {
-                $this->logger->notice((new \DateTime())->format('Y-m-d H:i:s') . "Story ID {$storyId} found in matches but does not exist in the database. Skipping.");
+                echo (new \DateTime())->format('Y-m-d H:i:s') . " Story ID {$storyId} found in matches but does not exist in the database. Skipping." . PHP_EOL;
                 continue;
             }
     
@@ -140,6 +141,7 @@ final class CheckStarsListsHandler
     
             if ($existingEntry) {
                 if ($existingEntry->getHighestPosition() > $position) {
+                    echo (new \DateTime())->format('Y-m-d H:i:s') . " Story {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position}!" . PHP_EOL;
                     $existingEntry->setHighestPosition($position);
                 }
             } else {
@@ -161,6 +163,8 @@ final class CheckStarsListsHandler
             ->findBy(['active' => 1, 'genre' => $genre]);
     
         $this->deactivateUnmatchedEntries($activeEntries, $storyIds);
+        
+        // echo (new \DateTime())->format('Y-m-d H:i:s') . " Processing {$genre} complete" . PHP_EOL;
         $this->entityManager->flush();
     }
     
