@@ -1,6 +1,7 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}{% else %}
 <div class="card-group support mt-3 mt-lg-5">
     <div class="card ">
         <h1 class="card-title p-3">Royal Road Watch [Meta-Analytics, Reincarnation]</h1>
@@ -23,9 +24,7 @@
                 <li>Because every author deserves to know when they're a star — even if it's only for 15 minutes.</li>
             </ul>
 
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}{% else %}
                 <p class="h4 text-center mt-5 mb-3">Track your rising star! <a href="/login">Login</a> or <a href="/register">Register</a> to get started!</p>
-            {% endif %}
 
             <h2 class="h2">What is it really?</h1>
             <p class="h5">Skip the meta-description nonsense.</p>
@@ -35,14 +34,15 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <div class="card mt-5 pb-5">
-    <h2 class="pt-3 mt-5 text-center">RS High Scores!</h2>
+    <h2 class="pt-3 mt-5 text-center"><i class="fa-regular fa-star"></i> Rising Stars High Scores <i class="fa-regular fa-star"></i></h2>
     <p class="card-text text-center mb-5" style="font-size: small;">Starting From December 24, 2024</p>
 
     <div class="col-12 text-center">
-        <h3 class="card-title p-5">Longest time at #1 on Rising Stars Main</h3>
-        <div class="card-body">
+        <div class="card-title p-5">
+        <h3>Longest time at #1 on Rising Stars Main</h3>
             <p class="h4 card-text p-0"><a href="{{main['url']}}">{{main['name']}}</a></p>
             <p class="card-text"><small class="text-body-secondary">Duration: {{main['duration']}}</small></p>
         </div>
@@ -64,12 +64,5 @@
         {% endfor %}
     </div>
 </div>
-
-{% endblock %}
-
-{% block javascripts %}
-{# <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous" async></script> #}
-
-
 
 {% endblock %}
