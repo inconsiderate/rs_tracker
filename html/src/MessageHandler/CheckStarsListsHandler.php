@@ -5,18 +5,21 @@ namespace App\MessageHandler;
 use App\Entity\Story;
 use App\Entity\RSMatch;
 use App\Message\CheckStarsLists;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Mime\Email;
 
 #[AsMessageHandler]
 final class CheckStarsListsHandler
 {
     
-    public function __construct(private LoggerInterface $logger, EntityManagerInterface $entityManager)
+    public function __construct(private LoggerInterface $logger, EntityManagerInterface $entityManager, MailerInterface $mailerInterface)
     {
         $this->entityManager = $entityManager;
+        $this->mailerInterface = $mailerInterface;
     }
 
     public function __invoke(CheckStarsLists $message)
@@ -145,10 +148,15 @@ final class CheckStarsListsHandler
     
             if ($existingEntry) {
                 if ($existingEntry->getHighestPosition() > $position) {
-                    echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position} on {$genre}!" . PHP_EOL;
+                    // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position} on {$genre}!" . PHP_EOL;
                     $existingEntry->setHighestPosition($position);
                 }
             } else {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} entered the {$genre} list at #{$position}" . PHP_EOL;
+
+                $mailMessage = "Your story '{$storyEntity->getStoryName()}' has entered the " . RSMatch::getHumanReadableName($genre) . " list at #{$position}!";
+                $this->sendEmail($this->mailerInterface, $mailMessage);
+
                 $newEntry = new RSMatch();
                 $newEntry->setStoryID($storyEntity);
                 $newEntry->setGenre($genre);
@@ -180,5 +188,18 @@ final class CheckStarsListsHandler
                 $entry->setRemovedDate(new \DateTime());
             }
         }
+    }
+
+    private function sendEmail(MailerInterface $mailer, $message)
+    {
+        $email = (new Email())
+            ->from('notifications@royalroadwatch.site')
+            ->to('meiskant@gmail.com')
+            ->subject('Your Story is on Rising Stars!')
+            ->text('Sending emails is fun again!')
+            ->html($message);
+
+        $mailer->send($email);
+        return true;
     }
 }
