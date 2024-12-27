@@ -19,7 +19,7 @@
 
             {{ form_start(usernameForm) }}
                 <label for="username">Change Your Email Address?</label>
-                <input type="email" value="{{ field_value(usernameForm.username) }}" name="{{ field_name(usernameForm.username) }}" id="{{ field_name(usernameForm.username) }}" class="form-control mb-3" autocomplete="username" required>     
+                <input placeholder="example@royalroadwatch.site" type="email" value="{{ field_value(usernameForm.username) }}" name="{{ field_name(usernameForm.username) }}" id="{{ field_name(usernameForm.username) }}" class="form-control mt-1 mb-2" autocomplete="username" required>     
                 {{ form_row(usernameForm.save) }}
             {{ form_end(usernameForm) }}
 
@@ -28,19 +28,21 @@
     <div class="card col-md-6 m-1">
         <h4 class="card-title p-3 text-center"><strong>Pro</strong> User Preferences (coming soon!)</h4>
         <div class="card-body">
-            <label for="minimumRankEmail" class="form-label">Only receive an email when my story is ranked at least: <strong id="rankValue"></strong> </label>
-            <input type="range" class="form-range" min="1" max="50" id="minimumRankEmail" disabled>
+        
+            {# <p class="text-center mb-5">Become a Patron to use these settings</p> #}
+
+            <label for="minimumRankEmail" class="form-label">Only receive an email if my story is ranked at least: <strong id="rankValue"> {{app.user.minimumRankToSendEmail}}</strong> </label>
+            <p><span>1 </span><input style="height:0.6rem;width:90%" type="range" class="form-range" min="1" max="50" value="{{app.user.minimumRankToSendEmail}}" id="minimumRankEmail" disabled><span> 50</span></p>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="displayHiddenLists" disabled>
+                <input class="form-check-input" type="checkbox" role="switch" id="displayHiddenLists" value="{{app.user.displayHiddenLists}}" {% if app.user.displayHiddenLists %}checked {% endif %}disabled>
                 <label class="form-check-label" for="displayHiddenLists">Display hidden lists</label>
             </div>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="alertHiddenLists" disabled>
+                <input class="form-check-input" type="checkbox" role="switch" id="alertHiddenLists" value="{{app.user.emailHiddenLists}}" {% if app.user.emailHiddenLists %}checked {% endif %}disabled>
                 <label class="form-check-label" for="alertHiddenLists">Receive emails for hidden lists</label>
             </div>
-
         </div>
     </div>
 </div>

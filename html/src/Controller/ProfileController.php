@@ -18,14 +18,18 @@ class ProfileController extends AbstractController
     #[Route('/profile', name: 'app_profile')]
     public function app_home(Request $request, EntityManagerInterface $entityManager): Response
     {        
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException('You must be logged in to access this functionality.');
+        }
+
         $changeUsernameForm = $this->createForm(ChangeUsernameType::class);
-       
         $changeUsernameForm->handleRequest($request);
 
         if ($changeUsernameForm->isSubmitted() && $changeUsernameForm->isValid()) {
             $data = $changeUsernameForm->getData();
             $newUsername = $data['username'];
-            $user = $this->getUser(); 
             $user->setUsername($newUsername);
             $entityManager->persist($user);
             $entityManager->flush();
@@ -37,6 +41,7 @@ class ProfileController extends AbstractController
         ]);
     }
 
+    
 }
 
 ?>

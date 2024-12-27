@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
-#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
+#[UniqueEntity(fields: ['username'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -43,6 +44,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\ManyToMany(targetEntity: Story::class, mappedBy: 'users')]
     private Collection $stories;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $preferences = [];
 
     public function __construct()
     {
@@ -161,5 +165,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getPreferences(): array
+    {
+        return $this->preferences;
+    }
+
+    public function setPreferences(array $preferences): static
+    {
+        $this->preferences = $preferences;
+
+        return $this;
+    }
+    
+    public function getMinimumRankToSendEmail(): int
+    {
+        if (isset($this->getPreferences['rankToSendEmail'])) {
+            return $this->getPreferences['rankToSendEmail'];
+        } else {
+            return 50;
+        }
+
+    }
+    
+    public function getDisplayHiddenLists(): bool
+    {
+        if (isset($this->getPreferences['displayHiddenLists'])) {
+            return $this->getPreferences['displayHiddenLists'];
+        } else {
+            return false;
+        }
+
+    }
+    
+    public function getEmailHiddenLists(): bool
+    {
+        if (isset($this->getPreferences['emailHiddenLists'])) {
+            return $this->getPreferences['emailHiddenLists'];
+        } else {
+            return false;
+        }
+
     }
 }
