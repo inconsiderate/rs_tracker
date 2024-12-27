@@ -1,0 +1,57 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+
+<div class="card-group support mt-3 mt-lg-5">
+    <div class="card">
+        <h4 class="card-title p-3 text-center">Logged in as {{app.user.username}}</h4>
+    </div>
+</div>
+
+<div class="card-group support mt-3 mt-lg-5">
+    <div class="card col-md-6 m-1">
+        <h4 class="card-title p-3 text-center">User Preferences</h4>
+        <div class="card-body">
+            {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            {{ form_start(usernameForm) }}
+                <label for="username">Change Your Email Address?</label>
+                <input type="email" value="{{ field_value(usernameForm.username) }}" name="{{ field_name(usernameForm.username) }}" id="{{ field_name(usernameForm.username) }}" class="form-control mb-3" autocomplete="username" required>     
+                {{ form_row(usernameForm.save) }}
+            {{ form_end(usernameForm) }}
+
+        </div>
+    </div>
+    <div class="card col-md-6 m-1">
+        <h4 class="card-title p-3 text-center"><strong>Pro</strong> User Preferences (coming soon!)</h4>
+        <div class="card-body">
+            <label for="minimumRankEmail" class="form-label">Only receive an email when my story is ranked at least: <strong id="rankValue"></strong> </label>
+            <input type="range" class="form-range" min="1" max="50" id="minimumRankEmail" disabled>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="displayHiddenLists" disabled>
+                <label class="form-check-label" for="displayHiddenLists">Display hidden lists</label>
+            </div>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="alertHiddenLists" disabled>
+                <label class="form-check-label" for="alertHiddenLists">Receive emails for hidden lists</label>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script> 
+    var el = document.getElementById('rankValue'); 
+    var r = document.getElementById('minimumRankEmail'); 
+    el.innerText = r.valueAsNumber; 
+    r.addEventListener('change', () => { 
+        el.innerText = r.valueAsNumber; 
+    }) 
+</script> 
+
+{% endblock %}

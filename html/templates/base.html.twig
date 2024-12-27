@@ -61,9 +61,11 @@
                         </li>
                     </ul>
                 </div>
+                
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="/profile" class="btn btn-outline-success me-3" type="submit">Profile</a>{% endif %}
 
                 <form class="d-flex" role="login">
-                    <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}/login{% endif %}" class="btn btn-outline-success" type="submit">{% if is_granted('IS_AUTHENTICATED_FULLY') %}Logout{% else %}Login{% endif %}</a>
+                    <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}/login{% endif %}" class="btn btn-outline-info" type="submit">{% if is_granted('IS_AUTHENTICATED_FULLY') %}Logout{% else %}Login{% endif %}</a>
                 </form>
 
             </div>
