@@ -22,12 +22,7 @@ final class CheckStarsListsHandler
     public function __invoke(CheckStarsLists $message)
     {
         echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Starting Rising Stars checks...' . PHP_EOL;
-        $storyGenreMap = [];
         $allStories = [];
-        
-        foreach (RSMatch::ALL_GENRES as $genre) {
-            $storyGenreMap[$genre] = [];
-        }
         
         // Check main page
         // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars main page...' . PHP_EOL;
@@ -37,18 +32,26 @@ final class CheckStarsListsHandler
         $matches = $this->verifyStoriesExist($mainPageContent, $mainPageUrl);
         $this->processMatches($matches, 'main');
 
-
         // Check genre pages
         // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars genre pages...' . PHP_EOL;
         $baseGenreUrl = "https://www.royalroad.com/fictions/rising-stars?genre=";
         
+        // pull data for all the main genres
         foreach (RSMatch::ALL_GENRES as $genre) {
             $genreUrl = $baseGenreUrl . urlencode($genre);
             $genrePageContent = $this->fetchPageContent($genreUrl);
         
             $matches = $this->verifyStoriesExist($genrePageContent, $genreUrl);
             $this->processMatches($matches, $genre);
+        }
 
+        // then pull data for all the secondary tags
+        foreach (RSMatch::ALL_TAGS as $genre) {
+            $genreUrl = $baseGenreUrl . urlencode($genre);
+            $genrePageContent = $this->fetchPageContent($genreUrl);
+        
+            $matches = $this->verifyStoriesExist($genrePageContent, $genreUrl);
+            $this->processMatches($matches, $genre);
         }
         
         echo (new \DateTime())->format('Y-m-d H:i:s') . " >>>> Rising Stars checks complete." . PHP_EOL;
@@ -64,6 +67,7 @@ final class CheckStarsListsHandler
             $existingStory = $this->entityManager->getRepository(Story::class)->findOneBy(['storyId' => $match['storyId']]); 
             if (!$existingStory) {
                 // Create a new Story if it doesn't exist
+                echo (new \DateTime())->format('Y-m-d H:i:s') . " {$match['storyName']} not in DB. Creating new story." . PHP_EOL;
                 $newStory = new Story();
                 $newStory->setStoryName($match['storyName']);
                 $newStory->setStoryId($match['storyId']);
@@ -141,7 +145,7 @@ final class CheckStarsListsHandler
     
             if ($existingEntry) {
                 if ($existingEntry->getHighestPosition() > $position) {
-                    echo (new \DateTime())->format('Y-m-d H:i:s') . " Story {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position}!" . PHP_EOL;
+                    echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position} on {$genre}!" . PHP_EOL;
                     $existingEntry->setHighestPosition($position);
                 }
             } else {

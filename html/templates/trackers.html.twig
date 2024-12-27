@@ -1,12 +1,12 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-<div class="card-group support mt-3 mt-lg-5">
-    <div class="card ">
+<div class="card-group mt-3 mt-lg-5">
+    <div class="card">
         <h2 class="card-title p-3 text-center">Your Stars History</h2>
         <div class="card-body">
-            <div class="card-text">
-                <table class="table table-responsive" id="matchTable">
+            <table class="table">
+                <table class="table table-responsive" id="genreTable">
                     <thead>
                         <tr>
                             <th>Entered List</th>
@@ -21,7 +21,7 @@
                         <tr>
                             <td>{{item.date|date("m/d/Y H:i")}}</td>
                             <td>{{item.storyName}}</td>
-                            <td>{{item.genre|capitalize}}</td>
+                            <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
                             <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
                             <td>{{item.timeOnList}} </td>
                         </tr>
@@ -34,13 +34,56 @@
             </div>
         </div>    
     </div>
+
+    <div class="card-group mt-3 mt-lg-5">
+        <div class="card">
+            <h2 class="card-title p-3 text-center">Secret Hidden RS Lists</h2>
+            <div class="card-body">
+                    <table class="table table-responsive" id="tagTable">
+                        <thead>
+                            <tr>
+                                <th>Entered List</th>
+                                <th>Story Title</th>
+                                <th>RS List</th>
+                                <th>Highest Position</th>
+                                <th>Consecutive<br/>Time on RS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in tags %}
+                            <tr>
+                                <td>{{item.date|date("m/d/Y H:i")}}</td>
+                                <td>{{item.storyName}}</td>
+                                <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
+                                <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
+                                <td>{{item.timeOnList}} </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on the list!</td>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>    
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block javascripts %}
     <script>
-        $('#matchTable').DataTable({
-            pageLength: 50
+        $('#genreTable').DataTable({
+            pageLength: 50,
+                order: [
+                    [1, 'asc']
+                ]
+        });
+        $('#tagTable').DataTable({
+            pageLength: 50,
+                order: [
+                    [1, 'asc']
+                ]
         });
     </script>
 {% endblock %}

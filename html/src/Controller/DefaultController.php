@@ -17,21 +17,6 @@ class DefaultController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function app_home(EntityManagerInterface $entityManager): Response
     {
-        // $activeEntries = $entityManager->getRepository(RSMatch::class)
-        // ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
-
-        $data = [];
-        // foreach ($activeEntries as $entry) {
-        //     $data[] = [
-        //         'storyName' => $entry->getStoryID()->getStoryName(),
-        //         'date' => $entry->getDate(),
-        //         'genre' => $entry->getGenre(),
-        //         'highestPosition' => $entry->getHighestPosition(),
-        //         'timeOnList' => $entry->getTimeOnList(),
-        //         'active' => $entry->isActive(),
-        //     ];
-        // }
-
         $genreNumberOnes = [];
         $mainNumberOne = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne('main');
         foreach (RSMatch::ALL_GENRES as $genre) {
@@ -65,21 +50,37 @@ class DefaultController extends AbstractController
         // get user data for page view
         $activeEntries = $entityManager->getRepository(RSMatch::class)->findByUser($user);
 
-        $data = [];
+        $genreMatches = [];
+        $tagMatches = [];
         foreach ($activeEntries as $entry) {
-            $data[] = [
-                'storyName' => $entry->getStoryID()->getStoryName(),
-                'date' => $entry->getDate(),
-                'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
-                'highestPosition' => $entry->getHighestPosition(),
-                'timeOnList' => $entry->getTimeOnList(),
-                'active' => $entry->isActive(),
-            ];
+            if (in_array($entry->getGenre(), RSMatch::ALL_GENRES, true) || $entry->getGenre() == 'main')  {
+                $genreMatches[] = [
+                    'storyName' => $entry->getStoryID()->getStoryName(),
+                    'date' => $entry->getDate(),
+                    'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                    'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
+                    'highestPosition' => $entry->getHighestPosition(),
+                    'timeOnList' => $entry->getTimeOnList(),
+                    'active' => $entry->isActive(),
+                ];
+            } else {
+                $tagMatches[] = [
+                    'storyName' => $entry->getStoryID()->getStoryName(),
+                    'date' => $entry->getDate(),
+                    'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                    'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
+                    'highestPosition' => $entry->getHighestPosition(),
+                    'timeOnList' => $entry->getTimeOnList(),
+                    'active' => $entry->isActive(),
+                ];
+            }
+            
         }
 
         // Render the form view
         return $this->render('trackers.html.twig', [
-            'data' => $data,
+            'data' => $genreMatches,
+            'tags' => $tagMatches,
         ]);
     }
 
