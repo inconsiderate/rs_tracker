@@ -20,7 +20,7 @@
 
                 <h1 class="h1 mb-3 font-weight-normal">Please Sign In <span class="h6">or <a href="/register">Register</a></span></h1>
                 <label for="username">Email Address</label>
-                <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control mb-3" autocomplete="username" required autofocus>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control mb-3" autocomplete="username" required autofocus>
                 <label for="password">Password</label>
                 <input type="password" name="_password" id="password" class="form-control mb-3" autocomplete="current-password" required>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
