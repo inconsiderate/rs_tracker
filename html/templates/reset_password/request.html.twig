@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reset your password{% endblock %}
+
+{% block body %}
+
+
+<div class="card-group support mt-3 mt-lg-5">
+    <div class="card ">
+        <div class="card-body">
+            <h1 class="h1 mb-3 font-weight-normal">Reset your password</a></span></h1>
+
+            {% for flash_error in app.flashes('reset_password_error') %}
+                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+            {% endfor %}
+
+            {{ form_start(requestForm) }}
+                <label for="username">Email Address</label>
+                <input type="text" value="{{ field_value(requestForm.username) }}" name="{{ field_name(requestForm.username) }}" id="{{ field_name(requestForm.username) }}" class="form-control mb-3" autocomplete="username" required autofocus>
+                
+                <div>
+                    <small>Enter your email address, and we will send you a link to reset your password.</small>
+                </div>
+                <br/>
+                <button class="btn btn-primary">Send password reset email</button>
+            {{ form_end(requestForm) }}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
