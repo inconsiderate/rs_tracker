@@ -193,7 +193,7 @@ final class CheckStarsListsHandler
     private function sendEmail(MailerInterface $mailer, $message)
     {
         $email = (new Email())
-            ->from('notifications@royalroadwatch.site')
+            ->from('Royal Road Watch <notifications@royalroadwatch.site>')
             ->to('meiskant@gmail.com')
             ->subject('Your Story is on Rising Stars!')
             ->text('Sending emails is fun again!')
