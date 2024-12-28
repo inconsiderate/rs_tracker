@@ -51,6 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->stories = new ArrayCollection();
+        $this->preferences['sendMeEmails'] = true;
     }
 
     public function getId(): ?int
@@ -179,41 +180,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
     
+    public function setPreference(string $key, mixed $value): static
+    {
+        if (!is_array($this->preferences)) {
+            $this->preferences = [];
+        }
+    
+        $this->preferences[$key] = $value;
+    
+        return $this;
+    }
+    
     public function getMinimumRankToSendEmail(): int
     {
-        if (isset($this->getPreferences['rankToSendEmail'])) {
-            return $this->getPreferences['rankToSendEmail'];
-        } else {
-            return 50;
-        }
+        return $this->preferences['rankToSendEmail'] ?? 50;
     }
     
     public function getDisplayHiddenLists(): bool
     {
-        if (isset($this->getPreferences['displayHiddenLists'])) {
-            return $this->getPreferences['displayHiddenLists'];
-        } else {
-            return false;
-        }
+        return $this->preferences['displayHiddenLists'] ?? false;
     }
     
     public function getEmailHiddenLists(): bool
     {
-        if (isset($this->getPreferences['emailHiddenLists'])) {
-            return $this->getPreferences['emailHiddenLists'];
-        } else {
-            return false;
-        }
+        return $this->preferences['emailHiddenLists'] ?? false;
     }
-    
     
     public function getSendMeEmails(): bool
     {
-        if (isset($this->getPreferences['sendMeEmails'])) {
-            return $this->getPreferences['sendMeEmails'];
-        } else {
-            return true;
-        }
+        return $this->preferences['sendMeEmails'] ?? true;
     }
 
     // helper so we don't get confused

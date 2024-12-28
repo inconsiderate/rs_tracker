@@ -5,7 +5,7 @@
 
 <div class="card-group support mt-3 mt-lg-5">
     <div class="card">
-        <h4 class="card-title p-3 text-center">Logged in as {{app.user.username}}</h4>
+        <h4 class="card-title p-3 m-0 text-center">Logged in as {{app.user.username}}</h4>
     </div>
 </div>
 
@@ -17,12 +17,27 @@
             <div class="alert alert-danger">{{ message }}</div>
             {% endfor %}
 
-            {{ form_start(usernameForm) }}
-                <label for="username">Change Your Email Address?</label>
-                <input placeholder="example@royalroadwatch.site" type="email" value="{{ field_value(usernameForm.username) }}" name="{{ field_name(usernameForm.username) }}" id="{{ field_name(usernameForm.username) }}" class="form-control mt-1 mb-2" autocomplete="username" required>     
-                {{ form_row(usernameForm.save) }}
-            {{ form_end(usernameForm) }}
+            <form action="{{ path('app_profile') }}" method="post">
+                {{ form_widget(userPreferencesForm._token) }}
+                <div class="form-check form-switch">
+                    {{ form_widget(userPreferencesForm.sendMeEmails, {
+                        'attr': {'class': 'form-check-input', 'role': 'switch'
+                        },
+                        'required': false
+                    }) }}
+                    <label class="form-check-label" for="{{ userPreferencesForm.sendMeEmails.vars.id }}">Send Me Emails</label>
+                </div>
+                <button type="submit" class="mt-3 btn btn-primary">Save Preferences</button>
+            </form>
 
+
+            <div class="mt-5">
+                {{ form_start(usernameForm) }}
+                    <label for="username">Change Your Email Address?</label>
+                    <input placeholder="example@royalroadwatch.site" type="email" value="{{ field_value(usernameForm.username) }}" name="{{ field_name(usernameForm.username) }}" id="{{ field_name(usernameForm.username) }}" class="form-control mt-1 mb-2" autocomplete="username" required>     
+                    {{ form_row(usernameForm.save) }}
+                {{ form_end(usernameForm) }}
+            </div>
         </div>
     </div>
     <div class="card col-md-6 m-1">
@@ -43,6 +58,7 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="alertHiddenLists" value="{{app.user.emailHiddenLists}}" {% if app.user.emailHiddenLists %}checked {% endif %}disabled>
                 <label class="form-check-label" for="alertHiddenLists">Receive emails for hidden lists</label>
             </div>
+            <button type="submit" class="mt-3 btn btn-primary disabled" disabled>Save Pro Preferences</button>
         </div>
     </div>
 </div>
