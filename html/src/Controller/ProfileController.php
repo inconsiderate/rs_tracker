@@ -39,6 +39,7 @@ class ProfileController extends AbstractController
         ->add('sendMeEmails', CheckboxType::class, [
             'label' => 'sendMeEmails',
             'attr' => ['placeholder' => 'sendMeEmails'],
+            'data' => $user->getSendMeEmails()
         ])
         ->add('save', SubmitType::class, [
             'label' => 'Save',
