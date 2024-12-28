@@ -340,7 +340,8 @@ class RSMatch
         if ($interval->h > 0) {
             $parts[] = $interval->h . ' hour' . ($interval->h > 1 ? 's' : '');
         }
-        if ($interval->i > 0) {
+        // Only include minutes if less than 1 day
+        if ($interval->d === 0 && $interval->i > 0) { 
             $parts[] = $interval->i . ' minute' . ($interval->i > 1 ? 's' : '');
         }
     
