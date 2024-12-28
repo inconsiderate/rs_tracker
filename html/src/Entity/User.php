@@ -186,7 +186,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         } else {
             return 50;
         }
-
     }
     
     public function getDisplayHiddenLists(): bool
@@ -196,7 +195,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         } else {
             return false;
         }
-
     }
     
     public function getEmailHiddenLists(): bool
@@ -206,6 +204,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         } else {
             return false;
         }
+    }
+    
+    
+    public function getSendMeEmails(): bool
+    {
+        if (isset($this->getPreferences['sendMeEmails'])) {
+            return $this->getPreferences['sendMeEmails'];
+        } else {
+            return true;
+        }
+    }
 
+    // helper so we don't get confused
+    public function getEmailAddress(): ?string
+    {
+        return $this->username;
     }
 }
