@@ -150,37 +150,17 @@ final class CheckStarsListsHandler
                 if ($existingEntry->getHighestPosition() > $position) {
                     // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position} on {$genre}!" . PHP_EOL;
                     $existingEntry->setHighestPosition($position);
+
+                    if ($position == 1) {
+                        echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} has reached #{$position} on {$genre}!" . PHP_EOL;
+                        $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has reached **NUMBER ONE** on the " . RSMatch::getHumanReadableName($genre) . " list! Congrats!";
+                    }
+
                 }
             } else {
                 echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} entered the {$genre} list at #{$position} " . PHP_EOL;
                 
                 $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has entered the " . RSMatch::getHumanReadableName($genre) . " list at #{$position}!";
-                $userList = $storyEntity->getUsers();
-                foreach ($userList as $user) {
-                    $sendEmail = true;
-
-                    // don't send emails if they opt-out
-                    if (!$user->getSendMeEmails()) {
-                        $sendEmail = false;
-                    }
-                    
-                    // if the position is higher (numerically lower) than the user's minimum rank, do not send.
-                    if ($position > $user->getMinimumRankToSendEmail()) {
-                        $sendEmail = false;
-                    }
-                    
-                    // if the genre is in the hidden list only send if they're a subscription member.
-                    // if (RSMatch::ALL_TAGS[$genre] && (!$user->isSubscriptionMember() || !$user->getEmailHiddenLists())) {
-                    if (RSMatch::ALL_TAGS[$genre] && !$user->getEmailHiddenLists()) {
-                        $sendEmail = false;
-                    }
-                    
-                    if ($sendEmail) {
-                        echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} sending email to: " . $user->getEmailAddress() . PHP_EOL;
-                        $this->sendEmail($this->mailerInterface, $mailMessage, $user->getEmailAddress());
-                    }
-                }
-                
 
                 $newEntry = new RSMatch();
                 $newEntry->setStoryID($storyEntity);
@@ -190,6 +170,33 @@ final class CheckStarsListsHandler
                 $newEntry->setActive(1);
                 $newEntries[] = $newEntry;
             }
+
+            $userList = $storyEntity->getUsers();
+            foreach ($userList as $user) {
+                $sendEmail = true;
+
+                // don't send emails if they opt-out
+                if (!$user->getSendMeEmails()) {
+                    $sendEmail = false;
+                }
+                
+                // if the position is higher (numerically lower) than the user's minimum rank, do not send.
+                if ($position > $user->getMinimumRankToSendEmail()) {
+                    $sendEmail = false;
+                }
+                
+                // if the genre is in the hidden list only send if they're a subscription member.
+                // if (RSMatch::ALL_TAGS[$genre] && (!$user->isSubscriptionMember() || !$user->getEmailHiddenLists())) {
+                if (RSMatch::ALL_TAGS[$genre] && !$user->getEmailHiddenLists()) {
+                    $sendEmail = false;
+                }
+                
+                if ($sendEmail) {
+                    echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} sending email to: " . $user->getEmailAddress() . PHP_EOL;
+                    $this->sendEmail($this->mailerInterface, $mailMessage, $user->getEmailAddress());
+                }
+            }
+
         }
     
         foreach ($newEntries as $entry) {
@@ -217,10 +224,10 @@ final class CheckStarsListsHandler
     {
         $email = (new Email())
             ->from('Royal Road Watch <notifications@royalroadwatch.site>')
-            ->to('meiskant@gmail.com')
+            ->to($toAddress)
             ->subject('Your Story is on Rising Stars!')
             ->text('Sending emails is fun again!')
-            ->html($message . " sent to: " . $toAddress);
+            ->html($message);
 
         $mailer->send($email);
         return true;
