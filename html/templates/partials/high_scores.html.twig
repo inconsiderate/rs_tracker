@@ -1,0 +1,28 @@
+<div class="card mt-5 pb-5">
+    <h2 class="pt-3 mt-5 text-center"><i class="fa-regular fa-star"></i> Rising Stars High Scores <i class="fa-regular fa-star"></i></h2>
+    <p class="card-text text-center mb-5" style="font-size: small;">Starting From December 24, 2024</p>
+
+    <div class="col-12 text-center">
+        <div class="card-title p-5">
+        <h3>Longest time at #1 on Rising Stars Main</h3>
+            <p class="h4 card-text p-0"><a href="{{main['url']}}">{{main['name']}}</a></p>
+            <p class="card-text"><small class="text-body-secondary">Duration: {{main['duration']}}</small></p>
+        </div>
+    </div>
+
+    <div class="d-flex p-sm-5 flex-wrap bd-highlight">
+        {% for item in numberOnes %}
+        <div class="card m-3 flex-fill bd-highlight">
+            <div class="row g-0">
+                <div class="">
+                    <h5 class="card-title p-3">Longest time at #1 on {{item['genre']}}</h5>
+                    <div class="card-body">
+                        <p class="card-text"><a href="{{item['url']}}">{{item['name']}}</a></p>
+                        <p class="card-text"><small class="text-body-secondary">Duration: {{item['duration']}}</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
