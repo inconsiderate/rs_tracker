@@ -141,7 +141,7 @@ final class CheckStarsListsHandler
                 echo (new \DateTime())->format('Y-m-d H:i:s') . " Story ID {$storyId} found in matches but does not exist in the database. Skipping." . PHP_EOL;
                 continue;
             }
-    
+            $sendEmail = false;
             $storyEntity = $existingStoriesMap[$storyId];
             $existingEntry = $this->entityManager->getRepository(RSMatch::class)
                 ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
@@ -154,13 +154,14 @@ final class CheckStarsListsHandler
                     if ($position == 1) {
                         echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} has reached #{$position} on {$genre}!" . PHP_EOL;
                         $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has reached **NUMBER ONE** on the " . RSMatch::getHumanReadableName($genre) . " list! Congrats!";
+                        $sendEmail = true;
                     }
-
                 }
             } else {
                 echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} entered the {$genre} list at #{$position} " . PHP_EOL;
                 
                 $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has entered the " . RSMatch::getHumanReadableName($genre) . " list at #{$position}!";
+                $sendEmail = true;
 
                 $newEntry = new RSMatch();
                 $newEntry->setStoryID($storyEntity);
@@ -173,7 +174,6 @@ final class CheckStarsListsHandler
 
             $userList = $storyEntity->getUsers();
             foreach ($userList as $user) {
-                $sendEmail = true;
 
                 // don't send emails if they opt-out
                 if (!$user->getSendMeEmails()) {
@@ -185,18 +185,16 @@ final class CheckStarsListsHandler
                     $sendEmail = false;
                 }
                 
-                // if the genre is in the hidden list only send if they're a subscription member.
-                // if (RSMatch::ALL_TAGS[$genre] && (!$user->isSubscriptionMember() || !$user->getEmailHiddenLists())) {
+                // if the genre is in the hidden list only send if they opt-in to hidden list
                 if (RSMatch::ALL_TAGS[$genre] && !$user->getEmailHiddenLists()) {
                     $sendEmail = false;
                 }
-                
+            
                 if ($sendEmail) {
-                    echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} sending email to: " . $user->getEmailAddress() . PHP_EOL;
+                    echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} at position {$position} on {$genre}, sending email to: " . $user->getEmailAddress() . PHP_EOL;
                     $this->sendEmail($this->mailerInterface, $mailMessage, $user->getEmailAddress());
                 }
             }
-
         }
     
         foreach ($newEntries as $entry) {
@@ -226,7 +224,6 @@ final class CheckStarsListsHandler
             ->from('Royal Road Watch <notifications@royalroadwatch.site>')
             ->to($toAddress)
             ->subject('Your Story is on Rising Stars!')
-            ->text('Sending emails is fun again!')
             ->html($message);
 
         $mailer->send($email);
