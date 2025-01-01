@@ -70,11 +70,24 @@ final class CheckStarsListsHandler
             $existingStory = $this->entityManager->getRepository(Story::class)->findOneBy(['storyId' => $match['storyId']]); 
             if (!$existingStory) {
                 // Create a new Story if it doesn't exist
+
+                $htmlContent = file_get_contents($match['storyAddress']);
+                
+                $crawler = new Crawler($htmlContent);
+                $storyName = $crawler->filter('.fic-title h1')->text();
+                $authorName = $crawler->filter('.fic-title h4 a')->text();
+                $authorProfileUrl = $crawler->filter('.fic-title h4 a')->attr('href');
+                preg_match('/\/profile\/(\d+)/', $authorProfileUrl, $authorProfileMatches);
+                $authorId = $authorProfileMatches[1] ?? null;
+
+
                 echo (new \DateTime())->format('Y-m-d H:i:s') . " {$match['storyName']} not in DB. Creating new story." . PHP_EOL;
                 $newStory = new Story();
-                $newStory->setStoryName($match['storyName']);
+                $newStory->setStoryName($storyName);
                 $newStory->setStoryId($match['storyId']);
                 $newStory->setStoryAddress($match['storyAddress']);
+                $newStory->setStoryAuthorId($authorId);
+                $newStory->setStoryAuthor($authorName);
                 $this->entityManager->persist($newStory);
             }
         }
@@ -97,7 +110,7 @@ final class CheckStarsListsHandler
             // Extract the link etc
             $link = $node->filter('a')->link();
             $url = $link->getUri(); // 
-            $storyName = $node->filter('h2.fiction-title')->text(); 
+            
             if (preg_match('/\/fiction\/(\d+)\//', $url, $idMatch)) {
                 $storyId = $idMatch[1];
             }
@@ -106,7 +119,6 @@ final class CheckStarsListsHandler
                 // Add the match to the list
                 $matches[] = [
                     'storyAddress' => $url,
-                    'storyName' => $storyName,
                     'position' => $position + 1, 
                     'storyId' => $storyId
                 ];
@@ -186,7 +198,7 @@ final class CheckStarsListsHandler
                 }
                 
                 // if the genre is in the hidden list only send if they opt-in to hidden list
-                if (RSMatch::ALL_TAGS[$genre] && !$user->getEmailHiddenLists()) {
+                if (isset(RSMatch::ALL_TAGS[$genre]) && !$user->getEmailHiddenLists()) {
                     $sendEmail = false;
                 }
             

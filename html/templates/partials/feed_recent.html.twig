@@ -1,0 +1,15 @@
+<div class="card mt-5 pb-5">
+    <h2 class="pt-3 mt-5 text-center mb-5"><i class="fa fa-meteor fa-rotate-180"></i> Recent Additions to Rising Stars Main <i class="fa fa-meteor fa-rotate-90"></i></h2>
+
+    <div class="col-12">
+        <div class="card-title p-5">
+            <div class="card-body p-5">
+                <div class="row">
+                    {% for item in recentFeedItems %}
+                    <p class="card-text col-sm-6 p-0"><a href="{{item['url']}}">{{item['name']}}</a><br/>{{item['author']}} <i class="fa-regular fa-star"></i> Ranked #48 <i class="fa-regular fa-star"></i> {{item['duration']}} ago</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

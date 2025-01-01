@@ -18,23 +18,36 @@ class DefaultController extends AbstractController
     public function app_home(EntityManagerInterface $entityManager): Response
     {
         $genreNumberOnes = [];
+        $recentFeedItems = [];
+        $recentFeed = $entityManager->getRepository(RSMatch::class)->findStoriesRecentlyAdded('main');
         $mainNumberOne = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne('main');
         foreach (RSMatch::ALL_GENRES as $genre) {
             $item = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne($genre);        
             $genreNumberOnes[$genre]['name'] = $item['story']->getStoryName();
+            $genreNumberOnes[$genre]['author'] = $item['story']->getStoryAuthor();
             $genreNumberOnes[$genre]['duration'] = $item['duration'];
             $genreNumberOnes[$genre]['url'] = $item['story']->getStoryAddress();
             $genreNumberOnes[$genre]['genre'] = RSMatch::getHumanReadableName($genre);
         }
 
+        foreach ($recentFeed as $item) {
+            $feedItem = [];
+            $feedItem['name'] = $item['story']->getStoryName();
+            $feedItem['author'] = $item['story']->getStoryAuthor();
+            $feedItem['url'] = $item['story']->getStoryAddress();
+            $feedItem['duration'] = $item['duration'];
+            $recentFeedItems[] = $feedItem;
+        }
         // Render the form view
         return $this->render('homepage.html.twig', [
             'main' => [
                 'name' => $mainNumberOne['story']->getStoryName(),
+                'author' => $mainNumberOne['story']->getStoryAuthor(),
                 'duration' => $mainNumberOne['duration'],
                 'url' => $mainNumberOne['story']->getStoryAddress(),
             ],
-            'numberOnes' => $genreNumberOnes
+            'numberOnes' => $genreNumberOnes,
+            'recentFeedItems' => $recentFeedItems
         ]);
     }
 
@@ -128,6 +141,11 @@ class DefaultController extends AbstractController
                 
                 $crawler = new Crawler($htmlContent);
                 $storyName = $crawler->filter('.fic-title h1')->text();
+                $authorName = $crawler->filter('.fic-title h4 a')->text();
+                $authorProfileUrl = $crawler->filter('.fic-title h4 a')->attr('href');
+                preg_match('/\/profile\/(\d+)/', $authorProfileUrl, $authorProfileMatches);
+                $authorId = $authorProfileMatches[1] ?? null;
+
 
                 if (!$storyName){
                     return $this->redirectToRoute('app_trackers_edit');
@@ -135,6 +153,8 @@ class DefaultController extends AbstractController
                 // Set the logged-in user as the User for the Story
                 $story->addUser($user);
                 $story->setStoryName($storyName);
+                $story->setStoryAuthorId($authorId);
+                $story->setStoryAuthor($authorName);
                 $story->setStoryId($storyId);
                 $story->setStoryAddress($storyUrl);
                 $entityManager->persist($story);

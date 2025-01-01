@@ -4,9 +4,12 @@
 
     <div class="col-12 text-center">
         <div class="card-title p-5">
-        <h3>Longest time at #1 on Rising Stars Main</h3>
+        <h3>Longest #1 Streak on Rising Stars Main</h3>
             <p class="h4 card-text p-0"><a href="{{main['url']}}">{{main['name']}}</a></p>
-            <p class="card-text"><small class="text-body-secondary">Duration: {{main['duration']}}</small></p>
+                        <p class="card-text text-body-secondary d-flex justify-content-between">
+                            <span>{{main['author']}}</span>
+                            <span>Duration: {{main['duration']}}</span>
+                        </p>
         </div>
     </div>
 
@@ -15,10 +18,13 @@
         <div class="card m-3 flex-fill bd-highlight">
             <div class="row g-0">
                 <div class="">
-                    <h5 class="card-title p-3">Longest time at #1 on {{item['genre']}}</h5>
-                    <div class="card-body">
-                        <p class="card-text"><a href="{{item['url']}}">{{item['name']}}</a></p>
-                        <p class="card-text"><small class="text-body-secondary">Duration: {{item['duration']}}</small></p>
+                    <h5 class="card-title p-3">Longest #1 Streak on {{item['genre']}}</h5>
+                    <div class="card-body pt-1">
+                        <p class="card-text h6 m-0 pb-3"><a href="{{item['url']}}">{{item['name']}}</a></p>
+                        <p class="card-text text-body-secondary d-flex justify-content-between">
+                            <small>{{item['author']}}</small>
+                            <small>Duration: {{item['duration']}}</small>
+                        </p>
                     </div>
                 </div>
             </div>

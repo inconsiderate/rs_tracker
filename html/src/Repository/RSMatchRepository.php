@@ -41,43 +41,24 @@ class RSMatchRepository extends ServiceEntityRepository
         $result = $qb->getQuery()->getResult();
         
         if (!empty($result)) {
-            // keep track of the longest duration and the story
             $longestDuration = 0;
             $longestStory = null;
             $longestDurationString = '';
         
             foreach ($result as $match) {
                 $startDate = $match->getDate();
-                $endDate = $match->getRemovedDate() ?: new \DateTime(); 
-        
+                $endDate = $match->getRemovedDate() ?: new \DateTime();
+            
                 // Calculate the duration in seconds
-                $duration = $startDate->diff($endDate);
-                $durationInSeconds = $duration->days * 86400 + $duration->h * 3600 + $duration->i * 60 + $duration->s;
-        
+                $durationInSeconds = $this->calculateDurationInSeconds($startDate, $endDate);
+            
                 // Check if this is the longest duration
                 if ($durationInSeconds > $longestDuration) {
                     $longestDuration = $durationInSeconds;
-                    $longestStory = $match->getStoryID(); 
-        
-                    // Build the humanreadable string
-                    $durationParts = [];
-                    if ($duration->days > 0) {
-                        $durationParts[] = $duration->days . ' day' . ($duration->days > 1 ? 's' : '');
-                    }
-                    if ($duration->h > 0) {
-                        $durationParts[] = $duration->h . ' hour' . ($duration->h > 1 ? 's' : '');
-                    }
-                    if ($duration->i > 0) {
-                        $durationParts[] = $duration->i . ' minute' . ($duration->i > 1 ? 's' : '');
-                    }
-        
-                    // If no days, hours, or minutes, fall back to seconds
-                    if (empty($durationParts) && $duration->s > 0) {
-                        $durationParts[] = $duration->s . ' second' . ($duration->s > 1 ? 's' : '');
-                    }
-        
-                    // Join the parts
-                    $longestDurationString = implode(', ', $durationParts);
+                    $longestStory = $match->getStoryID();
+            
+                    // Build the human-readable string
+                    $longestDurationString = $this->calculateDurationString($startDate, $endDate);
                 }
             }
         
@@ -89,4 +70,64 @@ class RSMatchRepository extends ServiceEntityRepository
         
         return [];
     }
+
+    public function findStoriesRecentlyAdded($genre): ?array
+    {
+        $qb = $this->createQueryBuilder('r');
+
+        $qb->select('r', 's')
+           ->leftJoin('r.storyID', 's');
+    
+        if (!empty($genre)) {
+            $qb->andWhere('r.genre = :genre')
+               ->setParameter('genre', $genre);
+        }
+        $qb->orderBy('r.date', 'DESC')
+           ->setMaxResults(10);
+    
+        $result = $qb->getQuery()->getResult();
+    
+        $data = [];
+        $currentDate = new \DateTime(); // Current time for calculating the duration
+    
+        foreach ($result as $match) {
+            $startDate = $match->getDate();
+            $durationString = $this->calculateDurationString($startDate, $currentDate);
+    
+            $data[] = [
+                'story' => $match->getStoryID(),
+                'duration' => $durationString,
+            ];
+        }
+    
+        return $data;
+    }
+
+    private function calculateDurationString(\DateTime $startDate, \DateTime $endDate): string
+    {
+        $duration = $startDate->diff($endDate);
+    
+        $durationParts = [];
+        if ($duration->days > 0) {
+            $durationParts[] = $duration->days . ' day' . ($duration->days > 1 ? 's' : '');
+        }
+        if ($duration->h > 0) {
+            $durationParts[] = $duration->h . ' hour' . ($duration->h > 1 ? 's' : '');
+        }
+        if ($duration->days == 0 && $duration->i > 0) {
+            $durationParts[] = $duration->i . ' minute' . ($duration->i > 1 ? 's' : '');
+        }
+        if (empty($durationParts) && $duration->s > 0) {
+            $durationParts[] = $duration->s . ' second' . ($duration->s > 1 ? 's' : '');
+        }
+    
+        return implode(' ', $durationParts);
+    }
+    
+    private function calculateDurationInSeconds(\DateTime $startDate, \DateTime $endDate): int
+    {
+        $duration = $startDate->diff($endDate);
+        return $duration->days * 86400 + $duration->h * 3600 + $duration->i * 60 + $duration->s;
+    }
+    
 }

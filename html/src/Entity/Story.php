@@ -37,6 +37,12 @@ class Story
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'stories')]
     private Collection $users;
 
+    #[ORM\Column(length: 255)]
+    private ?string $storyAuthor = null;
+
+    #[ORM\Column]
+    private ?int $storyAuthorId = null;
+
     public function __construct()
     {
         $this->rSMatches = new ArrayCollection();
@@ -134,6 +140,30 @@ class Story
     public function removeUser(User $user): static
     {
         $this->users->removeElement($user);
+
+        return $this;
+    }
+
+    public function getStoryAuthor(): ?string
+    {
+        return $this->storyAuthor;
+    }
+
+    public function setStoryAuthor(string $storyAuthor): static
+    {
+        $this->storyAuthor = $storyAuthor;
+
+        return $this;
+    }
+    
+    public function getStoryAuthorId(): ?int
+    {
+        return $this->storyAuthorId;
+    }
+
+    public function setStoryAuthorId(int $storyAuthorId): static
+    {
+        $this->storyAuthorId = $storyAuthorId;
 
         return $this;
     }
