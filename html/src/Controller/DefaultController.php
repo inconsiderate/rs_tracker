@@ -19,7 +19,7 @@ class DefaultController extends AbstractController
     {
         $genreNumberOnes = [];
         $recentFeedItems = [];
-        $recentFeed = $entityManager->getRepository(RSMatch::class)->findStoriesRecentlyAdded('main');
+        $recentFeed = $entityManager->getRepository(RSMatch::class)->findStoriesRecentlyAdded();
         $mainNumberOne = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne('main');
         foreach (RSMatch::ALL_GENRES as $genre) {
             $item = $entityManager->getRepository(RSMatch::class)->findStoryWithLongestTimeAtNumberOne($genre);        
@@ -35,6 +35,7 @@ class DefaultController extends AbstractController
             $feedItem['name'] = $item['story']->getStoryName();
             $feedItem['author'] = $item['story']->getStoryAuthor();
             $feedItem['url'] = $item['story']->getStoryAddress();
+            $feedItem['genre'] = RSMatch::getHumanReadableName($item['genre']);
             $feedItem['duration'] = $item['duration'];
             $recentFeedItems[] = $feedItem;
         }
@@ -69,6 +70,7 @@ class DefaultController extends AbstractController
             if (in_array($entry->getGenre(), RSMatch::ALL_GENRES, true) || $entry->getGenre() == 'main')  {
                 $genreMatches[] = [
                     'storyName' => $entry->getStoryID()->getStoryName(),
+                    'authorName' => $entry->getStoryID()->getStoryAuthor(),
                     'date' => $entry->getDate(),
                     'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
                     'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
@@ -79,6 +81,7 @@ class DefaultController extends AbstractController
             } else {
                 $tagMatches[] = [
                     'storyName' => $entry->getStoryID()->getStoryName(),
+                    'authorName' => $entry->getStoryID()->getStoryAuthor(),
                     'date' => $entry->getDate(),
                     'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
                     'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
@@ -176,6 +179,7 @@ class DefaultController extends AbstractController
         foreach ($stories as $story) {
             $data[] = [
                 'storyName' => $story->getStoryName(),
+                'authorName' => $story->getStoryAuthor(),
                 'id' => $story->getId(),
             ];
         }
@@ -188,7 +192,7 @@ class DefaultController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'delete_tracker', methods: ['POST', 'DELETE'])]
-    public function delete(int $id, EntityManagerInterface $entityManager): Response
+    public function app_trackers_delete(int $id, EntityManagerInterface $entityManager): Response
     {
         // Check if the user is logged in
         $user = $this->getUser();
@@ -201,6 +205,44 @@ class DefaultController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
+        return $this->redirectToRoute('app_trackers_edit');
+    }
+
+    #[Route('/delete/{id}', name: 'refresh_story', methods: ['GET'])]
+    public function app_story_refresh(int $id, EntityManagerInterface $entityManager): Response
+    {
+        // Check if the user is logged in
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('You must be logged in to access this functionality.');
+        }
+
+        $fetchedStory = $entityManager->getRepository(Story::class)->findOneById($id);
+            if (!$fetchedStory) {
+                $this->addFlash('error', 'Error: Story not found.');
+                return $this->redirectToRoute('app_trackers_edit');
+            } else {
+                $htmlContent = file_get_contents($fetchedStory->getStoryAddress());
+                if ($htmlContent === false) {
+                    $this->addFlash('error', 'Error: No content was found at the supplied URL');
+                    return $this->redirectToRoute('app_trackers_edit');
+                }
+                
+                $crawler = new Crawler($htmlContent);
+                $storyName = $crawler->filter('.fic-title h1')->text();
+                $authorName = $crawler->filter('.fic-title h4 a')->text();
+                $authorProfileUrl = $crawler->filter('.fic-title h4 a')->attr('href');
+                preg_match('/\/profile\/(\d+)/', $authorProfileUrl, $authorProfileMatches);
+                $authorId = $authorProfileMatches[1] ?? null;
+
+                $fetchedStory->setStoryName($storyName);
+                $fetchedStory->setStoryAuthorId($authorId);
+                $fetchedStory->setStoryAuthor($authorName);
+                $entityManager->persist($fetchedStory);
+            }
+            $entityManager->flush();
+
+        $this->addFlash('success', $storyName . ' has been refreshed');
         return $this->redirectToRoute('app_trackers_edit');
     }
 }

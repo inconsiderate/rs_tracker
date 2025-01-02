@@ -71,20 +71,18 @@ class RSMatchRepository extends ServiceEntityRepository
         return [];
     }
 
-    public function findStoriesRecentlyAdded($genre): ?array
+    public function findStoriesRecentlyAdded($genre = false): ?array
     {
         $qb = $this->createQueryBuilder('r');
 
-        $qb->select('r', 's')
-           ->leftJoin('r.storyID', 's');
-    
-        if (!empty($genre)) {
-            $qb->andWhere('r.genre = :genre')
-               ->setParameter('genre', $genre);
-        }
-        $qb->orderBy('r.date', 'DESC')
-           ->setMaxResults(10);
-    
+        $qb
+            ->select('r, s')
+            ->leftJoin('r.storyID', 's')
+            // ->where('r.genre = :genre')
+            // ->setParameter('genre', $genre)
+            ->orderBy('r.date', 'DESC')
+            ->setMaxResults(100);
+
         $result = $qb->getQuery()->getResult();
     
         $data = [];
@@ -93,11 +91,13 @@ class RSMatchRepository extends ServiceEntityRepository
         foreach ($result as $match) {
             $startDate = $match->getDate();
             $durationString = $this->calculateDurationString($startDate, $currentDate);
-    
-            $data[] = [
-                'story' => $match->getStoryID(),
-                'duration' => $durationString,
-            ];
+            if (!isset($data[$match->getStoryID()->getId()])) {
+                $data[$match->getStoryID()->getId()] = [
+                    'story' => $match->getStoryID(),
+                    'genre' => $match->getGenre(),
+                    'duration' => $durationString,
+                ];
+            }
         }
     
         return $data;
