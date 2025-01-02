@@ -5,48 +5,15 @@
     <div class="card ">
         <h1 class="card-title p-3">Admin Shit - Users</h1>
         <div class="card-body">
-            {% if users %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">id</th>
-                        <th scope="col">user</th>
-                        <th scope="col">patron</th>
-                        <th scope="col">roles</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for user in users %}
-                    <tr>
-                        <td><a href="/admin/users/{{user.id}}">{{user.id}}</a></td>
-                        <td>{{user.username}}</td>
-                        <td>{{user.isSubscribed}}</td>
-                        <td>
-                        {% for role in user.roles %}
-                            {{role}}
-                        {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
 
+        {% if users %}
+            {% include 'admin/_users_list.html.twig' %}
+        {% endif %}
 
-            {% if user %}
-            <p>user ID: {{user.id}}</p>
-            <p>email: {{user.username}}</p>
-            <p>patron: {{user.isSubscribed}}</p>
-            <p>roles: {% for role in user.roles %}
-                {{role}}
-            {% endfor %}</p>
-            <p>preferences: </p>
-            <p>{% for pref, prefvalue in user.preferences %}
-                {{pref}}: {{prefvalue}}<br/>
-            {% endfor %}</p>
-                
-                
-            {% endif %}
+        {% if user %}
+            {% include 'admin/_one_user.html.twig' %}
+        {% endif %}
+
         </div>
     </div>
 </div>

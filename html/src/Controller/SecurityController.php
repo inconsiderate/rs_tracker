@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use Patreon\API;
-use Patreon\OAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,9 +10,19 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\PatreonService;
 
 class SecurityController extends AbstractController
 {
+    private HttpClientInterface $httpClient;
+    private $patreonService;
+
+    public function __construct(HttpClientInterface $httpClient, PatreonService $patreonService)
+    {
+        $this->httpClient = $httpClient;
+        $this->patreonService = $patreonService;
+    }
+
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -35,12 +43,6 @@ class SecurityController extends AbstractController
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
-
-    private HttpClientInterface $httpClient;
-    public function __construct(HttpClientInterface $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
     
     #[Route('/patreon', name: 'app_patreon')]
     public function app_patreon(Request $request, EntityManagerInterface $entityManager): Response
@@ -60,7 +62,6 @@ class SecurityController extends AbstractController
         $clientId = $_ENV['PATREON_CLIENT_ID'];
         $clientSecret = $_ENV['PATREON_CLIENT_SECRET'];
         $redirectUri = $_ENV['PATREON_REDIRECT_URI'];
-
 
         try {
             // Exchange the authorization code for an access token
@@ -89,17 +90,18 @@ class SecurityController extends AbstractController
             $refreshToken = $data['refresh_token'];
             $expiresIn = $data['expires_in'];
 
-            $patronStatus = $this->confirmPatreonMembership($accessToken);
-
+            $patronStatus = $this->patreonService->isActivePatreonMember($accessToken);
+            
             $user->setPreferences([
                 'patreonAccessToken' => $accessToken,
                 'patreonRefreshToken' => $refreshToken,
                 'patreonTokenExpiry' => $expiresIn,
-                'patreonSubscriber' => $patronStatus,
+                'patreonSubscriber' => $patronStatus ? 'active_patron' : false,
             ]);
 
             $entityManager->persist($user);
             $entityManager->flush();
+
 
             $this->addFlash('notice', 'Access verified.');
 
@@ -108,16 +110,5 @@ class SecurityController extends AbstractController
         }
         
         return $this->redirectToRoute('app_profile');
-    }
-
-    private function confirmPatreonMembership($accessToken)
-    {
-        $oauth_client = new OAuth($_ENV['PATREON_CLIENT_ID'], $_ENV['PATREON_CLIENT_SECRET']);
-        $tokens = $oauth_client->get_tokens($_GET['code'], $_ENV['PATREON_REDIRECT_URI']);
-
-        $api_client = new API($accessToken);
-        $patron_response = $api_client->fetch_user();
-        
-        return $patron_response['included'][0]['attributes']['patron_status'] ?? null;
     }
 }

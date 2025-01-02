@@ -1,0 +1,22 @@
+
+<h3>General</h3>
+
+<p>user ID: {{user.id}}</p>
+<p>email: {{user.username}}</p>
+<p>patron: {{user.isSubscribed}}</p>
+<p>roles: {% for role in user.roles %}
+    {{role}}
+{% endfor %}</p>
+
+<h3>User Preferences: </h3>
+<p>{% for pref, prefvalue in user.preferences %}
+    {{pref}}: {{prefvalue}}<br/>
+{% endfor %}</p>
+
+<h3>Fetched Patreon Data:</h3>
+membership_status: {{patronData.membership_status}} <br/>
+membership_type: {{patronData.membership_type}} <br/>
+currently_entitled_amount_cents: {{patronData.currently_entitled_amount_cents}} <br/>
+last_charge_date: {{patronData.last_charge_date}} <br/>
+lifetime_support_cents: {{patronData.lifetime_support_cents}} <br/>
+pledge_relationship_start: {{patronData.pledge_relationship_start|date("M d, Y")}} <br/>

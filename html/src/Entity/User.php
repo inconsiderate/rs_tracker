@@ -173,6 +173,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->preferences;
     }
 
+    public function getPreference($pref)
+    {
+        return $this->preferences[$pref];
+    }
+
     public function setPreferences(array $preferences): static
     {
         $this->preferences = $preferences;
