@@ -210,6 +210,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->preferences['sendMeEmails'] ?? true;
     }
+    
+    public function getSubscriptionLevel(): int
+    {
+        return $this->preferences['subscriptionLevel'] ?? 0;
+    }
+    
+    public function isSubscribed(): bool
+    {
+        return ($this->preferences['patreonSubscriber'] ?? false) === 'active_patron';
+    }
 
     // helper so we don't get confused
     public function getEmailAddress(): ?string

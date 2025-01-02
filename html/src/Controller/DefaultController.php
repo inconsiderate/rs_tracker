@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
-{
+{    
     #[Route('/', name: 'app_home')]
     public function app_home(EntityManagerInterface $entityManager): Response
     {

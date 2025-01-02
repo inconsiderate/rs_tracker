@@ -16,6 +16,9 @@
             {% for message in app.flashes('error') %}
             <div class="alert alert-danger">{{ message }}</div>
             {% endfor %}
+            {% for message in app.flashes('notice') %}
+            <div class="alert alert-notice">{{ message }}</div>
+            {% endfor %}
 
             <form action="{{ path('app_profile') }}" method="post">
                 {{ form_widget(userPreferencesForm._token) }}
@@ -44,7 +47,7 @@
         <h4 class="card-title p-3 text-center"><strong>Pro</strong> User Preferences (coming soon!)</h4>
         <div class="card-body">
         
-            {# <p class="text-center mb-5">Become a Patron to use these settings</p> #}
+            {# <p class="text-center mb-5"><a href="https://www.patreon.com/oauth2/authorize">Login to Patreon To Access Pro Features</a></p> #}
 
             <label for="minimumRankEmail" class="form-label">Only receive an email if my story is ranked at least: <strong id="rankValue"> {{app.user.minimumRankToSendEmail}}</strong> </label>
             <p><span>1 </span><input style="height:0.6rem;width:90%" type="range" class="form-range" min="1" max="50" value="{{app.user.minimumRankToSendEmail}}" id="minimumRankEmail" disabled><span> 50</span></p>
