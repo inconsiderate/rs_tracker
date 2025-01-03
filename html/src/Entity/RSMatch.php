@@ -246,6 +246,9 @@ class RSMatch
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $removedDate = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?array $matchEmailSent = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -352,5 +355,30 @@ class RSMatch
     
         // Join the parts with a space
         return implode(' ', $parts);
+    }
+
+    public function getMatchEmailSent(): ?array
+    {
+        return $this->matchEmailSent;
+    }
+
+    public function setMatchEmailSent(?array $matchEmailSent): static
+    {
+        $this->matchEmailSent = $matchEmailSent;
+
+        return $this;
+    }
+    
+    public function addHasBeenEmailed(int $userId): self
+    {
+        if (!in_array($userId, $this->matchEmailSent, true)) {
+            $this->matchEmailSent[] = $userId;
+        }
+    
+        return $this;
+    }
+    public function hasBeenEmailed(int $userId): bool
+    {
+        return in_array($userId, $this->matchEmailSent, true);
     }
 }

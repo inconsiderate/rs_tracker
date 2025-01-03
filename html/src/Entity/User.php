@@ -48,6 +48,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::ARRAY)]
     private array $preferences = [];
 
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $patreonData = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $patreonId = null;
+
     public function __construct()
     {
         $this->stories = new ArrayCollection();
@@ -200,9 +206,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
     
-    public function getMinimumRankToSendEmail(): int
+    public function getMinRankToNotify(): int
     {
-        return $this->preferences['rankToSendEmail'] ?? 50;
+        return $this->preferences['minRankToNotify'] ?? 10;
     }
     
     public function getDisplayHiddenLists(): bool
@@ -220,19 +226,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->preferences['sendMeEmails'] ?? true;
     }
     
-    public function getSubscriptionLevel(): int
-    {
-        return $this->preferences['subscriptionLevel'] ?? 0;
-    }
-    
     public function isSubscribed(): bool
     {
-        return ($this->preferences['patreonSubscriber'] ?? false) === 'active_patron';
+        $patreonData = $this->getPatreonData();
+        if (isset($patreonData['patron_status']) && $patreonData['patron_status'] == 'active_patron') {
+            return true;
+        }
+        return false;
     }
-
     // helper so we don't get confused
     public function getEmailAddress(): ?string
     {
         return $this->username;
+    }
+
+    public function getPatreonData(): ?array
+    {
+        return $this->patreonData;
+    }
+
+    public function setPatreonData(?array $patreonData): static
+    {
+        if (!is_array($this->patreonData)) {
+            $this->patreonData = [];
+        }
+    
+        $this->patreonData = array_merge($this->patreonData, $patreonData);
+    
+        return $this;
+    }
+
+    public function getPatreonId(): ?int
+    {
+        return $this->patreonId;
+    }
+
+    public function setPatreonId(?int $patreonId): static
+    {
+        $this->patreonId = $patreonId;
+
+        return $this;
     }
 }

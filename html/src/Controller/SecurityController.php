@@ -90,9 +90,10 @@ class SecurityController extends AbstractController
             $refreshToken = $data['refresh_token'];
             $expiresIn = $data['expires_in'];
 
-            $patronStatus = $this->patreonService->isActivePatreonMember($accessToken);
-            
-            $user->setPreferences([
+            $patronData = $this->patreonService->fetchPatreonData($accessToken);
+            $user->setPatreonData($patronData);
+            $user->setPatreonId($patronData['id']);
+            $user->setPatreonData([
                 'patreonAccessToken' => $accessToken,
                 'patreonRefreshToken' => $refreshToken,
                 'patreonTokenExpiry' => $expiresIn,

@@ -2,6 +2,8 @@
 
 {% block body %}
 <div class="card-group mt-3 mt-lg-5">
+
+
     <div class="card">
         <h2 class="card-title p-3 text-center">Your Stars History</h2>
         <div class="card-body">
@@ -35,6 +37,17 @@
         </div>    
     </div>
 
+
+    {% if not app.user.isSubscribed %}
+        <div class="alert alert-info mt-3" role="alert">
+        <a href="/profile">Check Your Profile to Unlock Subscriber Benefits:</a><br/>
+        - Get notified instantly! <br/>
+        - Track ranks from 50 up to first place!<br/>
+        - View and track hidden genre lists right here in this spot!
+        </div>
+    {% endif %}
+
+    {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}
     <div class="card-group mt-3 mt-lg-5">
         <div class="card">
             <h2 class="card-title p-3 text-center">Secret Hidden RS Lists</h2>
@@ -68,7 +81,9 @@
             </div>    
         </div>
     </div>
+    {% endif %}
 </div>
+
 {% endblock %}
 
 {% block javascripts %}

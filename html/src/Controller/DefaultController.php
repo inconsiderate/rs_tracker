@@ -11,12 +11,20 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
 
 class DefaultController extends AbstractController
-{    
+{     
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     #[Route('/', name: 'app_home')]
     public function app_home(EntityManagerInterface $entityManager): Response
-    {
+    {                
         $genreNumberOnes = [];
         $recentFeedItems = [];
         $recentFeed = $entityManager->getRepository(RSMatch::class)->findStoriesRecentlyAdded();
@@ -68,27 +76,31 @@ class DefaultController extends AbstractController
         $tagMatches = [];
         foreach ($activeEntries as $entry) {
             if (in_array($entry->getGenre(), RSMatch::ALL_GENRES, true) || $entry->getGenre() == 'main')  {
-                $genreMatches[] = [
-                    'storyName' => $entry->getStoryID()->getStoryName(),
-                    'authorName' => $entry->getStoryID()->getStoryAuthor(),
-                    'date' => $entry->getDate(),
-                    'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
-                    'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
-                    'highestPosition' => $entry->getHighestPosition(),
-                    'timeOnList' => $entry->getTimeOnList(),
-                    'active' => $entry->isActive(),
-                ];
+                if ($entry->getHighestPosition() <= $user->getMinRankToNotify()) {
+                    $genreMatches[] = [
+                        'storyName' => $entry->getStoryID()->getStoryName(),
+                        'authorName' => $entry->getStoryID()->getStoryAuthor(),
+                        'date' => $entry->getDate(),
+                        'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                        'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
+                        'highestPosition' => $entry->getHighestPosition(),
+                        'timeOnList' => $entry->getTimeOnList(),
+                        'active' => $entry->isActive(),
+                    ];
+                }
             } else {
-                $tagMatches[] = [
-                    'storyName' => $entry->getStoryID()->getStoryName(),
-                    'authorName' => $entry->getStoryID()->getStoryAuthor(),
-                    'date' => $entry->getDate(),
-                    'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
-                    'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
-                    'highestPosition' => $entry->getHighestPosition(),
-                    'timeOnList' => $entry->getTimeOnList(),
-                    'active' => $entry->isActive(),
-                ];
+                if ($entry->getHighestPosition() <= $user->getMinRankToNotify()) {
+                    $tagMatches[] = [
+                        'storyName' => $entry->getStoryID()->getStoryName(),
+                        'authorName' => $entry->getStoryID()->getStoryAuthor(),
+                        'date' => $entry->getDate(),
+                        'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                        'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
+                        'highestPosition' => $entry->getHighestPosition(),
+                        'timeOnList' => $entry->getTimeOnList(),
+                        'active' => $entry->isActive(),
+                    ];
+                }
             }
             
         }

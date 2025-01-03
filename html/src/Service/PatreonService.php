@@ -11,14 +11,15 @@ class PatreonService
         $response = $api_client->fetch_user();
 
         $result = [
-            'membership_status' => null,
-            'membership_type' => null,
+            'id' => null,
+            'patron_status' => null,
+            'type' => null,
             'currently_entitled_amount_cents' => null,
             'last_charge_date' => null,
             'lifetime_support_cents' => null,
             'pledge_relationship_start' => null,
         ];
-    
+
         // Check if the 'included' key exists and contains data
         if (isset($response['included']) && is_array($response['included'])) {
             foreach ($response['included'] as $included) {
@@ -26,8 +27,9 @@ class PatreonService
                     $attributes = $included['attributes'];
     
                     // Extract information if available
-                    $result['membership_status'] = $attributes['patron_status'] ?? null;
-                    $result['membership_type'] = $included['type'] ?? null;
+                    $result['id'] = $response['data']['id'] ?? null;
+                    $result['patron_status'] = $attributes['patron_status'] ?? null;
+                    $result['type'] = $included['type'] ?? null;
                     $result['currently_entitled_amount_cents'] = $attributes['currently_entitled_amount_cents'] ?? null;
                     $result['last_charge_date'] = $attributes['last_charge_date'] ?? null;
                     $result['lifetime_support_cents'] = $attributes['lifetime_support_cents'] ?? null;
@@ -57,7 +59,6 @@ class PatreonService
         return false;
     }
 
-    
     public function updatePatreonStatus($user)
     {
     }

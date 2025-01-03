@@ -24,7 +24,7 @@ final class CheckStarsListsHandler
 
     public function __invoke(CheckStarsLists $message)
     {
-        echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Starting Rising Stars checks...' . PHP_EOL;
+        // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Starting Rising Stars checks...' . PHP_EOL;
         $allStories = [];
         
         // Check main page
@@ -57,7 +57,7 @@ final class CheckStarsListsHandler
             $this->processMatches($matches, $genre);
         }
         
-        echo (new \DateTime())->format('Y-m-d H:i:s') . " >>>> Rising Stars checks complete." . PHP_EOL;
+        // echo (new \DateTime())->format('Y-m-d H:i:s') . " >>>> Rising Stars checks complete." . PHP_EOL;
     }
     
     private function verifyStoriesExist($pageContent, $pageUrl)
@@ -81,7 +81,7 @@ final class CheckStarsListsHandler
                 $authorId = $authorProfileMatches[1] ?? null;
 
 
-                echo (new \DateTime())->format('Y-m-d H:i:s') . " {$match['storyName']} not in DB. Creating new story." . PHP_EOL;
+                // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$match['storyName']} not in DB. Creating new story." . PHP_EOL;
                 $newStory = new Story();
                 $newStory->setStoryName($storyName);
                 $newStory->setStoryId($match['storyId']);
@@ -150,7 +150,7 @@ final class CheckStarsListsHandler
             $position = $match['position'];
     
             if (!isset($existingStoriesMap[$storyId])) {
-                echo (new \DateTime())->format('Y-m-d H:i:s') . " Story ID {$storyId} found in matches but does not exist in the database. Skipping." . PHP_EOL;
+                // echo (new \DateTime())->format('Y-m-d H:i:s') . " Story ID {$storyId} found in matches but does not exist in the database. Skipping." . PHP_EOL;
                 continue;
             }
             $sendEmail = false;
@@ -162,16 +162,17 @@ final class CheckStarsListsHandler
                 if ($existingEntry->getHighestPosition() > $position) {
                     // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} moved up from {$existingEntry->getHighestPosition()} to {$position} on {$genre}!" . PHP_EOL;
                     $existingEntry->setHighestPosition($position);
+                    $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has moved up the " . RSMatch::getHumanReadableName($genre) . " list to #{$position}!";
+                    $sendEmail = true;
 
                     if ($position == 1) {
-                        echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} has reached #{$position} on {$genre}!" . PHP_EOL;
+                        // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$existingEntry->getStoryID()->getStoryName()} has reached #{$position} on {$genre}!" . PHP_EOL;
                         $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has reached **NUMBER ONE** on the " . RSMatch::getHumanReadableName($genre) . " list! Congrats!";
                         $sendEmail = true;
                     }
                 }
             } else {
-                echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} entered the {$genre} list at #{$position} " . PHP_EOL;
-                
+                // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} entered the {$genre} list at #{$position} " . PHP_EOL;
                 $mailMessage = "Your tracked story '{$storyEntity->getStoryName()}' has entered the " . RSMatch::getHumanReadableName($genre) . " list at #{$position}!";
                 $sendEmail = true;
 
@@ -191,12 +192,16 @@ final class CheckStarsListsHandler
                 if (!$user->getSendMeEmails()) {
                     $sendEmail = false;
                 }
-                
-                // if the position is higher (numerically lower) than the user's minimum rank, do not send.
-                if ($position > $user->getMinimumRankToSendEmail()) {
+                // if the position is lower (numerically higher) than the user's minimum rank, do not send
+                if ($position > $user->getMinRankToNotify()) {
                     $sendEmail = false;
                 }
-                
+
+                // if the user has already recieved a notice for this rise, and it's not at #1, do not send
+                if ($position != 1 && $existingEntry && $existingEntry->hasBeenEmailed($user->getId())) {
+                    $sendEmail = false;
+                }
+
                 // if the genre is in the hidden list only send if they opt-in to hidden list
                 if (isset(RSMatch::ALL_TAGS[$genre]) && !$user->getEmailHiddenLists()) {
                     $sendEmail = false;
@@ -204,6 +209,8 @@ final class CheckStarsListsHandler
             
                 if ($sendEmail) {
                     echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} at position {$position} on {$genre}, sending email to: " . $user->getEmailAddress() . PHP_EOL;
+                    $existingEntry->addHasBeenEmailed($user->getId());
+                    $this->entityManager->persist($existingEntry);
                     $this->sendEmail($this->mailerInterface, $mailMessage, $user->getEmailAddress());
                 }
             }
@@ -217,7 +224,7 @@ final class CheckStarsListsHandler
             ->findBy(['active' => 1, 'genre' => $genre]);
 
         $this->deactivateUnmatchedEntries($activeEntries, $storyIds);
-                $this->entityManager->flush();
+        $this->entityManager->flush();
     }
     
     private function deactivateUnmatchedEntries($activeEntries, $matchedIds)

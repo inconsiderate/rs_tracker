@@ -32,16 +32,13 @@ class AdminController extends AbstractController
     {
         $users = [];
         $user = [];
+        $patronData = [];
         if ($id) {
             $user = $entityManager->getRepository(User::class)->findOneById($id);
-            $accessToken = $user->getPreference('patreonAccessToken');
-            
-            if (!$accessToken) {
-                $this->addFlash('error', 'No access token found, please link to Patreon');
-                return false;
-            }
-            
-            $patronData = $this->patreonService->fetchPatreonData($accessToken);
+            $patronData = $user->getPatreonData();
+            $accessToken = isset($patronData['patreonAccessToken']) ?? null;
+
+            // $patronData = $this->patreonService->fetchPatreonData($accessToken);
         } else {
             $users = $entityManager->getRepository(User::class)->findAll();
         }

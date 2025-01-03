@@ -13,6 +13,7 @@
     {{pref}}: {{prefvalue}}<br/>
 {% endfor %}</p>
 
+{% if patronData %}
 <h3>Fetched Patreon Data:</h3>
 membership_status: {{patronData.membership_status}} <br/>
 membership_type: {{patronData.membership_type}} <br/>
@@ -20,3 +21,4 @@ currently_entitled_amount_cents: {{patronData.currently_entitled_amount_cents}} 
 last_charge_date: {{patronData.last_charge_date}} <br/>
 lifetime_support_cents: {{patronData.lifetime_support_cents}} <br/>
 pledge_relationship_start: {{patronData.pledge_relationship_start|date("M d, Y")}} <br/>
+{% endif %}
