@@ -76,7 +76,7 @@
             
             <div class="text-end mt-5"><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ app.request.server.get('PATREON_CLIENT_ID') }}&redirect_uri={{ app.request.server.get('PATREON_REDIRECT_URI') }}">Reconnect Patreon Account</a></div>
         {% else %}
-            <div class="text-center m-3 mb-5 visually-hidden"><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ app.request.server.get('PATREON_CLIENT_ID') }}&redirect_uri={{ app.request.server.get('PATREON_REDIRECT_URI') }}">Click Here to Connect a Patreon Subscription and<br/>Access Subscriber Features</a></div>
+            <div class="text-center m-3 mb-5"><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ app.request.server.get('PATREON_CLIENT_ID') }}&redirect_uri={{ app.request.server.get('PATREON_REDIRECT_URI') }}">Click Here to Connect a Patreon Subscription and<br/>Access Subscriber Features</a></div>
 
             <div class="alert alert-info" role="alert">
             Subscriber Benefits:<br/>
