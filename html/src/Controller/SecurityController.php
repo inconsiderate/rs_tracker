@@ -96,8 +96,7 @@ class SecurityController extends AbstractController
             $user->setPatreonData([
                 'patreonAccessToken' => $accessToken,
                 'patreonRefreshToken' => $refreshToken,
-                'patreonTokenExpiry' => $expiresIn,
-                'patreonSubscriber' => $patronStatus ? 'active_patron' : false,
+                'patreonTokenExpiry' => $expiresIn
             ]);
 
             $entityManager->persist($user);

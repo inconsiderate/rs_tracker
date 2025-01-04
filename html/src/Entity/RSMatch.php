@@ -371,14 +371,22 @@ class RSMatch
     
     public function addHasBeenEmailed(int $userId): self
     {
+        if (!is_array($this->matchEmailSent)) {
+            $this->matchEmailSent = [];
+        }
+
         if (!in_array($userId, $this->matchEmailSent, true)) {
             $this->matchEmailSent[] = $userId;
         }
-    
+
         return $this;
     }
+
     public function hasBeenEmailed(int $userId): bool
     {
-        return in_array($userId, $this->matchEmailSent, true);
+        if ($this->matchEmailSent){
+            return in_array($userId, $this->matchEmailSent, true);
+        }
+        return false;
     }
 }
