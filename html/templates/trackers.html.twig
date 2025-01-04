@@ -38,14 +38,7 @@
     </div>
 
 
-    {% if not app.user.isSubscribed %}
-        <div class="alert alert-info mt-3" role="alert">
-        <a href="/profile">Check Your Profile to Unlock Subscriber Benefits:</a><br/>
-        - Get notified instantly! <br/>
-        - Track ranks from 50 up to first place!<br/>
-        - View and track hidden genre lists right here in this spot!
-        </div>
-    {% endif %}
+
 
     {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}
     <div class="card-group mt-3 mt-lg-5">
@@ -80,7 +73,58 @@
                 </div>
             </div>    
         </div>
+    </div>    
+    {% endif %}
+
+    
+    {% if not app.user.isSubscribed %}
+
+        <div class="alert alert-info mt-3" role="alert">
+        <a href="/profile">Check Your Profile to Unlock Subscriber Benefits:</a><br/>
+        - Get notified instantly! <br/>
+        - Track ranks from 50 up to first place!<br/>
+        - View and track hidden genre lists right here in this spot!
+        </div>    
+
+    {% if tags %}
+    <div class="card-group mt-3 mt-lg-3">
+        <div class="card">
+            <h2 class="card-title p-3 text-center">Secret Hidden RS Lists</h2>
+            <div class="card-body">
+                    <table class="table table-responsive" id="tagTable">
+                        <thead>
+                            <tr>
+                                <th>Entered List</th>
+                                <th>Story Title</th>
+                                <th>RS List</th>
+                                <th>Highest Position</th>
+                                <th>Consecutive<br/>Time on RS</th>
+                            </tr>
+                        </thead>
+                        <tbody style="filter: blur(2px);">
+                        {% set strings = ['Artificial Intelligence', 'Low Fantasy', 'Time Loop', 'Reincarnation', 'School Life', 'Steampunk', 'Supernatural', 'First Contact', 'Dungeon', 'Villainous Lead'] %}
+                        {% for item in tags|slice(0, 4) %}
+                            {% set repeatStr = random(1, 5) %}
+                            
+                            <tr>
+                                <td>1̸̻́͐̍2̶̛̱̉/̵̝̘̀2̶̫̯̀̾̚2̶̩̒̋4̷͍͐ ̴̜̂̓0̴̙̺͆́4̸̮͂́:̴̥̜͛5̶̨̲̓̆5̵̽͜</td>
+                                <td>{{ range(1, repeatStr)|map(_ => 'P̶̝̃o̴̡̙̟͆w̴̭̫̟͑e̵͚̩̅̈́ŗ̶͕̀̾͗ȋ̷͔͑͜o̷̪̠̐r̴̨̟̋͊͐ ̸̧͎̊̅S̵͈̫͑ͅt̸̼̮̂o̴̠̩͚̐̕r̷̮͎̃͒y̴̧̛̯͛͛')|join('') }}</td>
+                                <td>{{ random(strings) }}</td>
+                                <td>{{ random(1, 50) }}</td>
+                                <td>1̶̛̜͖̾1̵̀ͅ ̶͚̥̌͠d̴̳̓a̵̳̐̓ỹ̵̙̤s̸͇̿͘ ̷̞̽2̷̹̯́̍ ̵̩͎̀ḣ̶͇ò̵̢̧͝u̴̥̇͠r̷̮̞͋s̶̟͙̓</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on the list!</td>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>    
+        </div>
     </div>
+                        
+    {% endif %}
     {% endif %}
 </div>
 

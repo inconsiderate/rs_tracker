@@ -78,7 +78,7 @@
         {% else %}
 
             <a href="https://www.patreon.com/inconsiderate/membership">
-            <img src="assets/images/patreon.jpg" class="img-fluid rounded mx-auto d-block" alt="Become a Patron">
+            <img src="{{ asset('assets/images/patreon.jpg') }}" class="img-fluid rounded mx-auto d-block" alt="Become a Patron">
             </a>
             <div class="text-center m-3 mb-5">Already a subscriber?<br/><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ app.request.server.get('PATREON_CLIENT_ID') }}&redirect_uri={{ app.request.server.get('PATREON_REDIRECT_URI') }}">Click Here to Connect a Patreon Subscription</a><br/>and access subscriber features</div>
 
