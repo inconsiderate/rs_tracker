@@ -52,14 +52,14 @@
             </table>
 
             
-            {% if app.user and not app.user.isSubscribed  %}
-
-        <div class="alert alert-info mt-3" role="alert">
-        <a href="/profile">Sign up to Unlock Subscriber Benefits:</a><br/>
-        - Get notified instantly when a story hits Rising Stars! <br/>
-        - Track ranks from 50 up to first place!<br/>
-        - View and track hidden genre lists across the site!
-        </div>  
+            {% if app.user and not app.user.isSubscribed or not app.user  %}
+                <div class="alert alert-info mt-3" role="alert">
+                <p>Don't see anything above? It's probably on a hidden genre list!</p>
+                <a href="/profile">Sign up to Unlock Subscriber Benefits:</a><br/>
+                - Get notified instantly when a story hits Rising Stars! <br/>
+                - Track ranks from 50 up to first place!<br/>
+                - View and track hidden genre lists across the site!
+                </div>  
             {% endif %}
         </div>
     </div>
