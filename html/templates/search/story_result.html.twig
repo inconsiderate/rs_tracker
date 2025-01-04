@@ -1,0 +1,80 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="card-group support mt-3 mt-lg-5">
+    <div class="card ">
+
+        <div class="card-title p-3">
+        
+            <h1 class="">Search Rising Stars History</h1>
+            <form action="{{ path('app_story_search') }}" method="POST" class="row g-3">
+                {{ form_widget(form._token) }}
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    {{ form_widget(form.query, {'attr': {'placeholder': 'Search', 'class': 'form-control'}}) }}
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <h2>{{ story.storyName }}<span class="h5"> - {{ story.storyAuthor }}</span></h2>
+            <table class="table table-hover" id="rsResults">
+                <thead>
+                    <tr>
+                        <th>Entered List</th>
+                        <th>RS List</th>
+                        <th>Highest Position</th>
+                        <th>Consecutive<br/>Time on RS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% set allTags = ['adventure', 'action', 'comedy', 'contemporary', 'drama', 'fantasy', 'historical', 'horror', 'mystery', 'psychological', 'romance', 'satire', 'sci_fi', 'one_shot', 'tragedy'] %}
+                {% for match in story.RSMatches %}
+                    {% if match.genre in allTags %}
+                    <tr>
+                        <td>{{match.date|date("m/d/Y")}}</td>
+                        <td>{{match.genre|capitalize}}</td>
+                        <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
+                        <td>{{match.timeOnList}} </td>
+                    </tr>
+                    {% else %}
+                        {% if app.user and app.user.isSubscribed and app.user.getDisplayHiddenLists %}
+                        <tr>
+                            <td>{{match.date|date("m/d/Y")}}</td>
+                            <td>{{match.genre|capitalize}}</td>
+                            <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
+                            <td>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+
+            
+            {% if app.user and not app.user.isSubscribed  %}
+
+        <div class="alert alert-info mt-3" role="alert">
+        <a href="/profile">Sign up to Unlock Subscriber Benefits:</a><br/>
+        - Get notified instantly when a story hits Rising Stars! <br/>
+        - Track ranks from 50 up to first place!<br/>
+        - View and track hidden genre lists across the site!
+        </div>  
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block javascripts %}
+    <script>
+        $('#rsResults').DataTable({
+            pageLength: 50,
+                order: [
+                    [1, 'asc']
+                ]
+        });
+    </script>
+{% endblock %}

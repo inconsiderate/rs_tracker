@@ -31,8 +31,9 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link" aria-current="page" href="/trackers">Watcher Results</a>
+                        <a class="nav-link" href="/search">Search</a>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <a class="nav-link" href="/trackers">Watcher Results</a>
                         <a class="nav-link" href="/trackers/edit">Edit Watchers</a>
                         {% endif %}
                         <a class="nav-link" href="/support">Support</a>
@@ -50,9 +51,12 @@
                 <i class="fa fa-meteor fa-rotate-180"></i> Royal Road Watch</a>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/search">Search</a>
+                        </li>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/trackers">Watcher Results</a>
+                            <a class="nav-link" href="/trackers">Watcher Results</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/trackers/edit">Edit Watchers</a>
@@ -89,7 +93,9 @@
                     <div class="col-12 col-lg-8 mb-3">
                         <h5>Support my work</h5>
                         <ul class="list-unstyled small">
-                            <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="inconsiderate" data-color="#BD5FFF" data-emoji="☕"  data-font="Poppins" data-text="buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+                            <a href="https://www.patreon.com/inconsiderate/membership">
+                            <img src="{{ asset('assets/images/patreon.jpg') }}" class="img-fluid rounded" alt="Become a Patron">
+                            </a>
                         </ul>
 
                         <p class="mb-2">This website is not affiliated with Royal Road in any way.</p>
