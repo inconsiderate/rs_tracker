@@ -208,7 +208,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     
     public function getMinRankToNotify(): int
     {
-        return $this->preferences['minRankToNotify'] ?? 10;
+        return $this->preferences['minRankToNotify'] ?? 20;
     }
     
     public function getDisplayHiddenLists(): bool

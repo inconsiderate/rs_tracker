@@ -34,7 +34,7 @@
                     {% if match.genre in allTags %}
                     <tr>
                         <td>{{match.date|date("m/d/Y")}}</td>
-                        <td>{{match.genre|capitalize}}</td>
+                        <td>{{match.genre|replace({'_': ' '})|title}}</td>
                         <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
                         <td>{{match.timeOnList}} </td>
                     </tr>
@@ -42,13 +42,17 @@
                         {% if app.user and app.user.isSubscribed and app.user.getDisplayHiddenLists %}
                         <tr>
                             <td>{{match.date|date("m/d/Y")}}</td>
-                            <td>{{match.genre|capitalize}}</td>
+                            <td>{{match.genre|replace({'_': ' '})|title}}</td>
                             <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
-                            <td>
+                            <td>{{match.timeOnList}} </td>
+                        </tr>
                         {% endif %}
                     {% endif %}
                 {% endfor %}
                 </tbody>
+                <tfoot>
+                    <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on this list!</td>
+                </tfoot>
             </table>
 
             
