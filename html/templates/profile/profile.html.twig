@@ -82,12 +82,7 @@
             </a>
             <div class="text-center m-3 mb-5">Already a subscriber?<br/><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ app.request.server.get('PATREON_CLIENT_ID') }}&redirect_uri={{ app.request.server.get('PATREON_REDIRECT_URI') }}">Click Here to Connect a Patreon Subscription</a><br/>and access subscriber features</div>
 
-            <div class="alert alert-info" role="alert">
-            Subscriber Benefits:<br/>
-            - Get notified instantly! <br/>
-            - Track ranks from 50 up to first place!<br/>
-            - View and track hidden genre lists!
-            </div>
+            {% include 'partials/_ad_unlock_block.html.twig' %}
 
             <label for="minimumRankEmail2" class="form-label">Minimum Rank to Notify: <strong id="rankValue">Currently locked at 20</strong> </label>
             <p><span>50 </span><input style="direction:rtl;height:0.6rem;width:90%" type="range" class="form-range" min="1" max="50" value="20"disabled><span> 1</span></p>

@@ -29,7 +29,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% set allTags = ['adventure', 'action', 'comedy', 'contemporary', 'drama', 'fantasy', 'historical', 'horror', 'mystery', 'psychological', 'romance', 'satire', 'sci_fi', 'one_shot', 'tragedy'] %}
+                {% set allTags = ['main', 'adventure', 'action', 'comedy', 'contemporary', 'drama', 'fantasy', 'historical', 'horror', 'mystery', 'psychological', 'romance', 'satire', 'sci_fi', 'one_shot', 'tragedy'] %}
                 {% for match in story.RSMatches %}
                     {% if match.genre in allTags %}
                     <tr>
@@ -57,13 +57,7 @@
 
             
             {% if app.user and not app.user.isSubscribed or not app.user  %}
-                <div class="alert alert-info mt-3" role="alert">
-                <p>Don't see anything above? It's probably on a hidden genre list!</p>
-                <a href="/profile">Sign up to Unlock Subscriber Benefits:</a><br/>
-                - Get notified instantly when a story hits Rising Stars! <br/>
-                - Track ranks from 50 up to first place!<br/>
-                - View and track hidden genre lists across the site!
-                </div>  
+                {% include 'partials/_ad_unlock_block.html.twig' %}
             {% endif %}
         </div>
     </div>
