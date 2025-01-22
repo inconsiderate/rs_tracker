@@ -33,7 +33,7 @@
                 {% for match in story.RSMatches %}
                     {% if match.genre in allTags %}
                     <tr>
-                        <td>{{match.date|date("m/d/Y")}}</td>
+                        <td>{{match.date|date("Y-m-d")}}</td>
                         <td>{{match.genre|replace({'_': ' '})|title}}</td>
                         <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
                         <td>{{match.timeOnList}} </td>
@@ -41,7 +41,7 @@
                     {% else %}
                         {% if app.user and app.user.isSubscribed and app.user.getDisplayHiddenLists %}
                         <tr>
-                            <td>{{match.date|date("m/d/Y")}}</td>
+                            <td>{{match.date|date("Y-m-d")}}</td>
                             <td>{{match.genre|replace({'_': ' '})|title}}</td>
                             <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
                             <td>{{match.timeOnList}} </td>

@@ -15,4 +15,24 @@ class StoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Story::class);
     }
+
+    public function findStoryIdsByUser(User $user): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.storyId')
+            ->innerJoin('s.users', 'u')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findStoriesWithUsers(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin('s.users', 'u') // Perform an inner join to ensure stories have users
+            ->distinct() // Ensure no duplicates are returned
+            ->getQuery()
+            ->getResult();
+    }
 }

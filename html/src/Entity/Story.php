@@ -43,10 +43,17 @@ class Story
     #[ORM\Column]
     private ?int $storyAuthorId = null;
 
+    /**
+     * @var Collection<int, RSDaily>
+     */
+    #[ORM\OneToMany(targetEntity: RSDaily::class, mappedBy: 'story', orphanRemoval: true)]
+    private Collection $rSDailies;
+
     public function __construct()
     {
         $this->rSMatches = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->rSDailies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -164,6 +171,36 @@ class Story
     public function setStoryAuthorId(int $storyAuthorId): static
     {
         $this->storyAuthorId = $storyAuthorId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RSDaily>
+     */
+    public function getRSDailies(): Collection
+    {
+        return $this->rSDailies;
+    }
+
+    public function addRSDaily(RSDaily $rSDaily): static
+    {
+        if (!$this->rSDailies->contains($rSDaily)) {
+            $this->rSDailies->add($rSDaily);
+            $rSDaily->setStory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRSDaily(RSDaily $rSDaily): static
+    {
+        if ($this->rSDailies->removeElement($rSDaily)) {
+            // set the owning side to null (unless already changed)
+            if ($rSDaily->getStory() === $this) {
+                $rSDaily->setStory(null);
+            }
+        }
 
         return $this;
     }

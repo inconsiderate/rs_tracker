@@ -208,9 +208,14 @@ final class CheckStarsListsHandler
                 }
             
                 if ($sendEmail) {
-                    echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} at position {$position} on {$genre}, sending email to: " . $user->getEmailAddress() . PHP_EOL;
-                    $existingEntry->addHasBeenEmailed($user->getId());
-                    $this->entityManager->persist($existingEntry);
+                    // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$storyEntity->getStoryName()} at position {$position} on {$genre}, sending email to: " . $user->getEmailAddress() . PHP_EOL;
+                    if ($existingEntry) {
+                        $existingEntry->addHasBeenEmailed($user->getId());
+                        $this->entityManager->persist($existingEntry);
+                    } else {
+                        $newEntry->addHasBeenEmailed($user->getId());
+                        $this->entityManager->persist($newEntry);
+                    }
                     $this->sendEmail($this->mailerInterface, $mailMessage, $user->getEmailAddress());
                 }
             }

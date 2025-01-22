@@ -21,7 +21,7 @@
                     <tbody>
                     {% for item in data %}
                         <tr>
-                            <td>{{item.date|date("m/d/Y H:i")}}</td>
+                            <td>{{item.date|date("Y-m-d H:i")}}</td>
                             <td>{{item.storyName}}</td>
                             <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
                             <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
@@ -58,7 +58,7 @@
                         <tbody>
                         {% for item in tags %}
                             <tr>
-                                <td>{{item.date|date("m/d/Y H:i")}}</td>
+                                <td>{{item.date|date("Y-m-d H:i")}}</td>
                                 <td>{{item.storyName}}</td>
                                 <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
                                 <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>

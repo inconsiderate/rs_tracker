@@ -129,5 +129,28 @@ class RSMatchRepository extends ServiceEntityRepository
         $duration = $startDate->diff($endDate);
         return $duration->days * 86400 + $duration->h * 3600 + $duration->i * 60 + $duration->s;
     }
+
+    public function findOpenMatchesForStory(int $storyId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.storyID = :storyId')
+            ->andWhere('m.active = true')
+            ->setParameter('storyId', $storyId)
+            ->getQuery()
+            ->getResult();
+    }
     
+    public function findRecentlyClosedMatchesForStory(int $storyId): array
+    {
+        $yesterday = (new \DateTimeImmutable('now'))->modify('-24 hours');
+
+        return $this->createQueryBuilder('m')
+            ->where('m.storyID = :storyId')
+            ->andWhere('m.active = false')
+            ->andWhere('m.removedDate > :yesterday')
+            ->setParameter('storyId', $storyId)
+            ->setParameter('yesterday', $yesterday)
+            ->getQuery()
+            ->getResult();
+    }
 }

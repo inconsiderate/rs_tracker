@@ -7,7 +7,7 @@
             <div class="card-body p-sm-5">
                 <div class="row">
                     {% for item in recentFeedItems|slice(0, 20) %}
-                    <p class="card-text col-sm-6 p-3"><a href="{{item['url']}}">{{item['name']}}</a><br/>Ranked #48 in {{item['genre']}} {{item['duration']}} ago</p>
+                    <p class="card-text col-sm-6 p-3"><a href="{{item['url']}}">{{item['name']}}</a><br/>Ranked #48 in {{item['genre']|replace({'_': ' '})|title}} {{item['duration']}} ago</p>
                     {% endfor %}
                 </div>
             </div>
