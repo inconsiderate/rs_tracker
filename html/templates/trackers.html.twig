@@ -1,10 +1,18 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
+
+
+
+{# {% include 'partials/_genre_daily.html.twig' %} #}
+{% include 'partials/_genre_record.html.twig' %}
+{% include 'partials/_tag_record.html.twig' %}
+
+
 <div class="card-group mt-3 mt-lg-5">
 
 
-    <div class="card">
+    <div class="card border-dark">
         <h2 class="card-title p-3 text-center">RS List History</h2>
         <div class="card-body">
             <table class="table">
@@ -19,7 +27,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for item in data %}
+                    {% for item in genreMatches %}
                         <tr>
                             <td>{{item.date|date("Y-m-d H:i")}}</td>
                             <td>{{item.storyName}}</td>
@@ -42,7 +50,7 @@
 
     {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}
     <div class="card-group mt-3 mt-lg-5">
-        <div class="card">
+        <div class="card border-dark">
             <h2 class="card-title p-3 text-center">Secret RS List History</h2>
             <div class="card-body">
                     <table class="table table-responsive" id="tagTable">
@@ -56,7 +64,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for item in tags %}
+                        {% for item in tagMatches %}
                             <tr>
                                 <td>{{item.date|date("Y-m-d H:i")}}</td>
                                 <td>{{item.storyName}}</td>
@@ -78,9 +86,9 @@
 
     {% if not app.user.isSubscribed %}
         {% include 'partials/_ad_unlock_block.html.twig' %}
-    {% if tags %}
+    {% if tagMatches %}
     <div class="card-group mt-3 mt-lg-3">
-        <div class="card">
+        <div class="card border-dark">
             <h2 class="card-title p-3 text-center">Secret RS List History</h2>
             <div class="card-body">
                     <table class="table table-responsive" id="tagTable">
@@ -95,7 +103,7 @@
                         </thead>
                         <tbody style="filter: blur(2px);">
                         {% set strings = ['Artificial Intelligence', 'Low Fantasy', 'Time Loop', 'Reincarnation', 'School Life', 'Steampunk', 'Supernatural', 'First Contact', 'Dungeon', 'Villainous Lead'] %}
-                        {% for item in tags|slice(0, 4) %}
+                        {% for item in tagMatches|slice(0, 4) %}
                             {% set repeatStr = random(1, 5) %}
                             
                             <tr>

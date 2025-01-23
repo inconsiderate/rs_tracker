@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Story;
 use App\Entity\RSMatch;
+use App\Entity\RSDaily;
 use App\Form\StoryFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -74,18 +75,37 @@ class DefaultController extends AbstractController
 
         $genreMatches = [];
         $tagMatches = [];
+        $genreData = [];
+        $tagData = [];
+        $genreDailyData = [];
+        
+        $dailyEntries = $entityManager->getRepository(RSDaily::class)->findByUser($user);
+        foreach ($dailyEntries as $entry) {
+            $genreDailyData[$entry->getStory()->getStoryName()][] = [
+                'rank' => $entry->getHighestPosition(),
+                'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                'day' => $entry->getDate()->format('Y-m-d'),
+            ];
+        }
+
+
         foreach ($activeEntries as $entry) {
+            $humanReadableGenre = RSMatch::getHumanReadableName($entry->getGenre());
             if (in_array($entry->getGenre(), RSMatch::ALL_GENRES, true) || $entry->getGenre() == 'main')  {
                 if ($entry->getHighestPosition() <= $user->getMinRankToNotify()) {
                     $genreMatches[] = [
                         'storyName' => $entry->getStoryID()->getStoryName(),
                         'authorName' => $entry->getStoryID()->getStoryAuthor(),
                         'date' => $entry->getDate(),
-                        'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                        'genre' => $humanReadableGenre,
                         'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
                         'highestPosition' => $entry->getHighestPosition(),
                         'timeOnList' => $entry->getTimeOnList(),
                         'active' => $entry->isActive(),
+                    ];
+                    $genreData[$entry->getStoryID()->getStoryName()][] = [
+                        'rank' => $entry->getHighestPosition(),
+                        'genre' => $humanReadableGenre,
                     ];
                 }
             } else {
@@ -94,21 +114,55 @@ class DefaultController extends AbstractController
                         'storyName' => $entry->getStoryID()->getStoryName(),
                         'authorName' => $entry->getStoryID()->getStoryAuthor(),
                         'date' => $entry->getDate(),
-                        'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                        'genre' => $humanReadableGenre,
                         'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
                         'highestPosition' => $entry->getHighestPosition(),
                         'timeOnList' => $entry->getTimeOnList(),
                         'active' => $entry->isActive(),
+                    ];
+
+                    $tagData[$entry->getStoryID()->getStoryName()][] = [
+                        'rank' => $entry->getHighestPosition(),
+                        'genre' => $humanReadableGenre,
                     ];
                 }
             }
             
         }
 
-        // Render the form view
+        $genreChartData = [];
+        foreach ($genreData as $name => $entries) {
+            $genreChartData[] = [
+                'label' => $name,
+                'data' => array_map(function ($entry) {
+                    return [
+                        'x' => $entry['genre'],
+                        'y' => $entry['rank'],
+                        'r' => 10,
+                    ];
+                }, $entries)
+            ];
+        }
+        $tagChartData = [];
+        foreach ($tagData as $name => $entries) {
+            $tagChartData[] = [
+                'label' => $name,
+                'data' => array_map(function ($entry) {
+                    return [
+                        'x' => $entry['genre'],
+                        'y' => $entry['rank'],
+                        'r' => 10,
+                    ];
+                }, $entries)
+            ];
+        }
+
         return $this->render('trackers.html.twig', [
-            'data' => $genreMatches,
-            'tags' => $tagMatches,
+            'genreMatches' => $genreMatches,
+            'tagMatches' => $tagMatches,
+            'genreChartData' => json_encode($genreChartData),
+            'tagChartData' => json_encode($tagChartData),
+            'genreDailyData' => json_encode($genreDailyData),
         ]);
     }
 

@@ -3,6 +3,6 @@ body {
     background-size: cover;
 }
 
-.card-title {
+[data-bs-theme=dark] .card-title {
     background-color: #1e1e1e;
 }
