@@ -1,10 +1,10 @@
-<div class="card mt-5 pb-5">
-    <h2 class="pt-3 mt-5 text-center"><i class="fa fa-meteor fa-rotate-180"></i> Ranking by Date <i class="fa fa-meteor fa-rotate-90"></i></h2>
-    <p class="card-text text-center mb-5" style="font-size: small;">Updated At Midnight PST</p>
+<div class="card mt-5">
+    <h2 class="pt-3 text-center"><i class="fa fa-meteor fa-rotate-180"></i> Ranking by Date <i class="fa fa-meteor fa-rotate-90"></i></h2>
+    <p class="card-text text-center mb-4" style="font-size: small;">Updated At Midnight PST</p>
 
     <div class="col-12">
-        <div class="card-title p-md-5">
-            <div class="card-body p-md-5">
+        <div class="card-title p-md-2 mb-0">
+            <div class="card-body p-md-2">
                 <div class="row">
                     <canvas id="rankingChart"></canvas>
                 </div>
@@ -19,7 +19,6 @@
 (async function () {
 
   const storyRankings = {{ genreDailyData|raw }}; 
-console.log(storyRankings)
   // Prepare data for each genre across stories
   const datasets = [];
 

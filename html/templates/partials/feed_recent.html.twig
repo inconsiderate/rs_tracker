@@ -1,10 +1,10 @@
-<div class="card border-dark mt-5 pb-5">
-    <h2 class="pt-3 mt-5 text-center"><i class="fa fa-meteor fa-rotate-180"></i> Recent Additions to Rising Stars <i class="fa fa-meteor fa-rotate-90"></i></h2>
-    <p class="card-text text-center mb-5" style="font-size: small;">Updated Every 15 Minutes</p>
+<div class="card border-dark mt-5">
+    <h2 class="pt-3 mt-2 text-center"><i class="fa fa-meteor fa-rotate-180"></i> Recent Additions to Rising Stars <i class="fa fa-meteor fa-rotate-90"></i></h2>
+    <p class="card-text text-center mb-4" style="font-size: small;">Updated Every 15 Minutes</p>
 
     <div class="col-12">
         <div class="card-title p-sm-5">
-            <div class="card-body p-sm-5">
+            <div class="card-body pt-sm-0 p-sm-5">
                 <div class="row">
                     {% for item in recentFeedItems|slice(0, 20) %}
                     <p class="card-text col-sm-6 p-3"><a href="{{item['url']}}">{{item['name']}}</a><br/>Ranked #48 in {{item['genre']|replace({'_': ' '})|title}} {{item['duration']}} ago</p>

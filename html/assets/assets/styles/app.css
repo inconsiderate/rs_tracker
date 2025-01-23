@@ -6,3 +6,8 @@ body {
 [data-bs-theme=dark] .card-title {
     background-color: #1e1e1e;
 }
+
+
+[data-bs-theme=light] .card-title {
+    background-color: #87c3ff22;
+}
