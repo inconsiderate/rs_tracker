@@ -80,12 +80,20 @@ class DefaultController extends AbstractController
         $genreDailyData = [];
         
         $dailyEntries = $entityManager->getRepository(RSDaily::class)->findByUser($user);
+        $today = new \DateTime();
+        $interval = new \DateInterval('P14D'); // only if within the last 14 days
+        $cutoffDate = $today->sub($interval);
+        
         foreach ($dailyEntries as $entry) {
-            $genreDailyData[$entry->getStory()->getStoryName()][] = [
-                'rank' => $entry->getHighestPosition(),
-                'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
-                'day' => $entry->getDate()->format('Y-m-d'),
-            ];
+            $entryDate = $entry->getDate();
+        
+            if ($entryDate >= $cutoffDate) {
+                $genreDailyData[$entry->getStory()->getStoryName()][] = [
+                    'rank' => $entry->getHighestPosition(),
+                    'genre' => RSMatch::getHumanReadableName($entry->getGenre()),
+                    'day' => $entryDate->format('Y-m-d'),
+                ];
+            }
         }
 
 

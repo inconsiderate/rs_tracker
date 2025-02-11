@@ -28,22 +28,41 @@ final class CheckStarsListsHandler
         $allStories = [];
         
         // Check main page
-        // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars main page...' . PHP_EOL;
+        echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars main page...' . PHP_EOL;
         $mainPageUrl = "https://www.royalroad.com/fictions/rising-stars";
         $mainPageContent = $this->fetchPageContent($mainPageUrl);
+        $headers = @get_headers($mainPageUrl);
+        if (!$headers || strpos($headers[0], '404') !== false) {
+            echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: Page not found (404) - $mainPageUrl " . PHP_EOL;
+            throw new Exception("Error: Page not found (404) - $mainPageUrl");
+        }
+        
+        if (empty($mainPageContent)) {
+            echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: No content returned from $mainPageUrl " . PHP_EOL;
+            throw new Exception("Error: No content returned from $mainPageUrl.");
+        }
 
         $matches = $this->verifyStoriesExist($mainPageContent, $mainPageUrl);
         $this->processMatches($matches, 'main');
 
         // Check genre pages
-        // echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars genre pages...' . PHP_EOL;
+        echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars genre pages...' . PHP_EOL;
         $baseGenreUrl = "https://www.royalroad.com/fictions/rising-stars?genre=";
         
         // pull data for all the main genres
         foreach (RSMatch::ALL_GENRES as $genre) {
             $genreUrl = $baseGenreUrl . urlencode($genre);
             $genrePageContent = $this->fetchPageContent($genreUrl);
-        
+            $headers = @get_headers($genreUrl);
+            if (!$headers || strpos($headers[0], '404') !== false) {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: Page not found (404) - $genreUrl " . PHP_EOL;
+                throw new Exception("Error: Page not found (404) - $genreUrl");
+            }
+            
+            if (empty($genrePageContent)) {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: No content returned from $genreUrl " . PHP_EOL;
+                throw new Exception("Error: No content returned from $genreUrl.");
+            }
             $matches = $this->verifyStoriesExist($genrePageContent, $genreUrl);
             $this->processMatches($matches, $genre);
         }
@@ -53,11 +72,21 @@ final class CheckStarsListsHandler
             $genreUrl = $baseGenreUrl . urlencode($genre);
             $genrePageContent = $this->fetchPageContent($genreUrl);
         
+            $headers = @get_headers($genreUrl);
+            if (!$headers || strpos($headers[0], '404') !== false) {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: Page not found (404) - $genreUrl " . PHP_EOL;
+                throw new Exception("Error: Page not found (404) - $genreUrl");
+            }
+            
+            if (empty($genrePageContent)) {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: No content returned from $genreUrl " . PHP_EOL;
+                throw new Exception("Error: No content returned from $genreUrl.");
+            }
             $matches = $this->verifyStoriesExist($genrePageContent, $genreUrl);
             $this->processMatches($matches, $genre);
         }
         
-        // echo (new \DateTime())->format('Y-m-d H:i:s') . " >>>> Rising Stars checks complete." . PHP_EOL;
+        echo (new \DateTime())->format('Y-m-d H:i:s') . " >>>> Rising Stars checks complete." . PHP_EOL;
     }
     
     private function verifyStoriesExist($pageContent, $pageUrl)

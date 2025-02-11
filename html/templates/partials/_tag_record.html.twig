@@ -6,7 +6,11 @@
         <div class="card-title p-md-2 mb-0">
             <div class="card-body p-md-2">
                 <div class="row">
-                    <canvas id="tagsChart"></canvas>
+                    {% if app.user and app.user.isSubscribed %}
+                      <canvas id="tagsChart"></canvas>
+                    {% else %}
+                      {% include 'partials/_ad_unlock_block.html.twig' %}
+                    {% endif %}
                 </div>
             </div>
         </div>

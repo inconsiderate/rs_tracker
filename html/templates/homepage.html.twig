@@ -1,7 +1,9 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-{% if is_granted('IS_AUTHENTICATED_FULLY') %}{% else %}
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+
+{% else %}
 <div class="card-group support mt-3 mt-lg-5">
     <div class="card border-dark">
         <h1 class="card-title p-3">Royal Road Watch [Meta-Analytics, Reincarnation]</h1>
@@ -32,6 +34,27 @@
             <p>After registration you'll be able to watch each of your stories on Royal Road, and receive an alert (coming soon) when you make it to any of the Rising Stars lists.<br/>
             When you get on any Rising Stars list, it'll be tracked in the database and you'll know how long you stayed on it.<br/>
             If you fall off the list and get back on later, you'll see that too!</p>
+
+<div class="card-group mt-3 mt-lg-5">
+    <div class="card border-dark p-5">
+        <h4 class="card-title p-2 mb-3 text-center">Free Features</h4>
+        <ul>
+            <li>Track any story you like, as many stories as you like.</li>
+            <li>Get an alert when any story you're tracking hits <strong>20th</strong> place or higher.</li>
+            <li>Track all of the <strong>standard</strong> genre Rising Stars lists (action, comedy, romance, etc), as well as the Main list itself.</li>
+        </ul>
+    </div>
+        
+    <div class="card border-dark p-5">
+        <h4 class="card-title p-2 mb-3 text-center">Patron Features</h4>
+        <ul>
+            <li><strong>All of the free</strong>, plus...</li>
+            <li>Get an alert when any story you're tracking hits <strong>50th</strong> place or higher.</li>
+            <li>Track all of the <strong>hidden</strong> genres Rising Stars lists (dungeon, time-travel, xianxia, gender-bender, etc).</li>
+            <li>View advanced analytics, such as highest rank over time.</li>
+        </ul>
+    </div>
+</div>
         </div>
     </div>
 </div>
