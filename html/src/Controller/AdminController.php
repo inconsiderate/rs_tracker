@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Patreon\API;
 use App\Entity\User;
+use App\Entity\Story;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,14 +38,20 @@ class AdminController extends AbstractController
             // $patronData = $this->patreonService->fetchPatreonData($accessToken);
         } else {
             $users = $entityManager->getRepository(User::class)->findAll();
+            $stories = $entityManager->getRepository(Story::class)->findAll();
+
+            $statsData['userCount'] = count($users);
+            $statsData['subscriberCount'] = count(array_filter($users, fn($user) => $user->isSubscribed()));
+            $statsData['storiesCount'] = count($stories);
         }
-        
+
+
 
         return $this->render('admin/admin.html.twig', [
             'users' => $users,
             'user' => $user,
             'patronData' => $patronData,
-            'stats' => $statsData,
+            'statsData' => $statsData,
         ]);
     }
 
