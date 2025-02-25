@@ -44,6 +44,7 @@ class DefaultController extends AbstractController
             $feedItem['name'] = $item['story']->getStoryName();
             $feedItem['author'] = $item['story']->getStoryAuthor();
             $feedItem['url'] = $item['story']->getStoryAddress();
+            $feedItem['id'] = $item['story']->getStoryID();
             $feedItem['genre'] = RSMatch::getHumanReadableName($item['genre']);
             $feedItem['duration'] = $item['duration'];
             $recentFeedItems[] = $feedItem;
