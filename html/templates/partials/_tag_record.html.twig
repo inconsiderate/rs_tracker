@@ -9,7 +9,7 @@
                     {% if app.user and app.user.isSubscribed %}
                       <canvas id="tagsChart"></canvas>
                     {% else %}
-                      {% include 'partials/_ad_unlock_block.html.twig' %}
+                      <a href="/profile" class="text-center">Become a Patron to Unlock Subscriber Benefits</a>
                     {% endif %}
                 </div>
             </div>

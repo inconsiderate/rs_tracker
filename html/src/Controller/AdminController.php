@@ -21,18 +21,14 @@ class AdminController extends AbstractController
         $this->patreonService = $patreonService;
     }
 
-    #[Route('/admin', name: 'app_admin')]
-    public function app_admin(EntityManagerInterface $entityManager): Response
-    {
-        return $this->render('admin/admin.html.twig');
-    }
-
-    #[Route('/admin/users/{id}', name: 'app_admin_user')]
+    #[Route('/admin/{id}', name: 'app_admin_user')]
     public function app_admin_user(EntityManagerInterface $entityManager, ?string $id = null): Response
     {
         $users = [];
         $user = [];
         $patronData = [];
+        $statsData = [];
+
         if ($id) {
             $user = $entityManager->getRepository(User::class)->findOneById($id);
             $patronData = $user->getPatreonData();
@@ -42,11 +38,13 @@ class AdminController extends AbstractController
         } else {
             $users = $entityManager->getRepository(User::class)->findAll();
         }
+        
 
-        return $this->render('admin/users.html.twig', [
+        return $this->render('admin/admin.html.twig', [
             'users' => $users,
             'user' => $user,
             'patronData' => $patronData,
+            'stats' => $statsData,
         ]);
     }
 

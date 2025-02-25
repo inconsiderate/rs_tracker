@@ -24,6 +24,8 @@
         "symfony/mailer": "7.1.*",
         "symfony/messenger": "7.1.*",
         "symfony/monolog-bundle": "^3.10",
+        "symfony/notifier": "7.1.*",
+        "symfony/novu-notifier": "7.1.*",
         "symfony/password-hasher": "7.1.*",
         "symfony/runtime": "7.1.*",
         "symfony/scheduler": "7.1.*",

@@ -5,10 +5,21 @@
     <div class="card border-dark">
         <h1 class="card-title p-3">Admin Shit</h1>
         <div class="card-body">
+            <div class="card-group support mt-3 mt-lg-5">
+                <div class="card border-dark">
+                    <div class="card-body">
 
-            <p class="text-center mb-5"><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ app.request.server.get('PATREON_CLIENT_ID') }}&redirect_uri={{ app.request.server.get('PATREON_REDIRECT_URI') }}">Login to Patreon To Access Pro Features</a></p>
+                    {% if users %}
+                        {% include 'admin/_users_list.html.twig' %}
+                    {% endif %}
 
-            <a href="/admin/users">User Stuff</a>
+                    {% if user %}
+                        {% include 'admin/_one_user.html.twig' %}
+                    {% endif %}
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

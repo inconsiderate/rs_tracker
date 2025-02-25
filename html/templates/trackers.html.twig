@@ -11,7 +11,7 @@
 
 <div class="card-group mt-3 mt-lg-5">
     <div class="card border-dark">
-        <h2 class="card-title p-3 mb-0 text-center">RS List History</h2>
+        <h2 class="card-title p-3 mb-0">RS List History</h2>
         <div class="card-body">
             <table class="table">
                 <table class="table table-responsive" id="genreTable">
@@ -49,7 +49,7 @@
     {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}
     <div class="card-group mt-3 mt-lg-5">
         <div class="card border-dark">
-            <h2 class="card-title p-3 mb-0 text-center">Secret RS List History</h2>
+            <h2 class="card-title p-3 mb-0">Secret RS List History</h2>
             <div class="card-body">
                     <table class="table table-responsive" id="tagTable">
                         <thead>
@@ -83,11 +83,14 @@
     {% endif %}
 
     {% if not app.user.isSubscribed %}
-        {% include 'partials/_ad_unlock_block.html.twig' %}
+    <div class="card-group mt-3 mt-lg-3">
+        <div class="card border-dark"><a href="/profile" class="text-center m-4">Become a Patron to Unlock Subscriber Benefits</a>
+        </div>
+        </div>
     {% if tagMatches %}
     <div class="card-group mt-3 mt-lg-3">
         <div class="card border-dark">
-            <h2 class="card-title p-3 text-center">Secret RS List History</h2>
+            <h2 class="card-title p-3">Secret RS List History</h2>
             <div class="card-body">
                     <table class="table table-responsive" id="tagTable">
                         <thead>
