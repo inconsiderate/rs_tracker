@@ -249,6 +249,24 @@ class RSMatch
     #[ORM\Column(nullable: true)]
     private ?array $matchEmailSent = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $startFollowerCount = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $endFollowerCount = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $startPageCount = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $endPageCount = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $startViewCount = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $endViewCount = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -388,5 +406,77 @@ class RSMatch
             return in_array($userId, $this->matchEmailSent, true);
         }
         return false;
+    }
+
+    public function getStartFollowerCount(): ?int
+    {
+        return $this->startFollowerCount;
+    }
+
+    public function setStartFollowerCount(?int $startFollowerCount): static
+    {
+        $this->startFollowerCount = $startFollowerCount;
+
+        return $this;
+    }
+
+    public function getEndFollowerCount(): ?int
+    {
+        return $this->endFollowerCount;
+    }
+
+    public function setEndFollowerCount(?int $endFollowerCount): static
+    {
+        $this->endFollowerCount = $endFollowerCount;
+
+        return $this;
+    }
+
+    public function getStartPageCount(): ?int
+    {
+        return $this->startPageCount;
+    }
+
+    public function setStartPageCount(?int $startPageCount): static
+    {
+        $this->startPageCount = $startPageCount;
+
+        return $this;
+    }
+
+    public function getEndPageCount(): ?int
+    {
+        return $this->endPageCount;
+    }
+
+    public function setEndPageCount(?int $endPageCount): static
+    {
+        $this->endPageCount = $endPageCount;
+
+        return $this;
+    }
+
+    public function getStartViewCount(): ?int
+    {
+        return $this->startViewCount;
+    }
+
+    public function setStartViewCount(?int $startViewCount): static
+    {
+        $this->startViewCount = $startViewCount;
+
+        return $this;
+    }
+
+    public function getEndViewCount(): ?int
+    {
+        return $this->endViewCount;
+    }
+
+    public function setEndViewCount(?int $endViewCount): static
+    {
+        $this->endViewCount = $endViewCount;
+
+        return $this;
     }
 }

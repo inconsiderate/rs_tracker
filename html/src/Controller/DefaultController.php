@@ -35,6 +35,7 @@ class DefaultController extends AbstractController
             $genreNumberOnes[$genre]['name'] = $item['story']->getStoryName();
             $genreNumberOnes[$genre]['author'] = $item['story']->getStoryAuthor();
             $genreNumberOnes[$genre]['duration'] = $item['duration'];
+            $genreNumberOnes[$genre]['id'] = $item['story']->getStoryID();
             $genreNumberOnes[$genre]['url'] = $item['story']->getStoryAddress();
             $genreNumberOnes[$genre]['genre'] = RSMatch::getHumanReadableName($genre);
         }
@@ -45,6 +46,8 @@ class DefaultController extends AbstractController
             $feedItem['author'] = $item['story']->getStoryAuthor();
             $feedItem['url'] = $item['story']->getStoryAddress();
             $feedItem['id'] = $item['story']->getStoryID();
+            $feedItem['rank'] = $item['rank'];
+            $feedItem['blurb'] = $item['blurb'];
             $feedItem['genre'] = RSMatch::getHumanReadableName($item['genre']);
             $feedItem['duration'] = $item['duration'];
             $recentFeedItems[] = $feedItem;

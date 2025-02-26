@@ -95,6 +95,8 @@ class RSMatchRepository extends ServiceEntityRepository
                 $data[$match->getStoryID()->getId()] = [
                     'story' => $match->getStoryID(),
                     'genre' => $match->getGenre(),
+                    'blurb' => $match->getStoryID()->getBlurb(),
+                    'rank' => $match->getHighestPosition(),
                     'duration' => $durationString,
                 ];
             }

@@ -18,11 +18,11 @@
             <hr>
 
             <p class="h4 text-center mt-5 mb-5">Track your rising star! <a href="/login">Login</a> or <a href="/register">Register</a> to get started!</p>
-            <p>Quietly walking home one day after work, Rising Stars was unexpectedly hit by a truck! Now they've awakened in a strange new world, a world made up of lists and genres and wordsmiths of every size and shape. Granted the powerful unique class 'Watcher', the newly christened Royal Road Watch (version 0.1) will need to adapt (and push out new versions) if they hope to survive! Armed with nothing but their own will to write, and a desire to climb the genre lists, Royal Road Watch will vow to defeat the evil Queen Procrastination and come out on top!</p>
+            <p>Quietly walking home one day after work, Rising Stars was unexpectedly hit by a truck! Now they've awakened in a strange new world, a world made up of lists and genres and wordsmiths of every size and shape. Granted the powerful unique class 'Watcher', the newly christened Royal Road Watch (version 0.8) will need to adapt (and push out new versions) if they hope to survive! Armed with nothing but their own will to write, and a desire to climb the genre lists, Royal Road Watch will vow to defeat the evil Queen Procrastination and come out on top!</p>
 
             <p class="mb-0"><strong>What You Can Expect:</strong></p>
             <ul>
-                <li>Instant Glory Alerts: Get notified the moment your story graces Rising Stars (coming soon).</li>
+                <li>Instant Glory Alerts: Get notified the moment your story graces Rising Stars.</li>
                 <li>Survival Stats: Track how long you hold onto your throne — whether it's hours, days, or *gasp* YEARS?!</li>
                 <li>Straightforward Design: Just the info you actually care about.</li>
                 <li>Because every author deserves to know when they're a star — even if it's only for 15 minutes.</li>
@@ -31,40 +31,58 @@
 
             <h2 class="h2">What is it really?</h1>
             <p class="h5">Skip the meta-description nonsense.</p>
-            <p>After registration you'll be able to watch each of your stories on Royal Road, and receive an alert (coming soon) when you make it to any of the Rising Stars lists.<br/>
+            <p>After registration you'll be able to watch each of your stories on Royal Road, and receive an alert when you make it to any of the Rising Stars lists.<br/>
             When you get on any Rising Stars list, it'll be tracked in the database and you'll know how long you stayed on it.<br/>
             If you fall off the list and get back on later, you'll see that too!</p>
 
-<div class="card-group mt-3 mt-lg-5">
-    <div class="card border-dark p-5">
-        <h4 class="card-title p-2 mb-3 text-center">Free Features</h4>
-        <ul>
-            <li>Track any story you like, as many stories as you like.</li>
-            <li>Get an alert when any story you're tracking hits <strong>20th</strong> place or higher.</li>
-            <li>Track all of the <strong>standard</strong> genre Rising Stars lists (action, comedy, romance, etc), as well as the Main list itself.</li>
-        </ul>
-    </div>
-        
-    <div class="card border-dark p-5">
-        <h4 class="card-title p-2 mb-3 text-center">Patron Features</h4>
-        <ul>
-            <li><strong>All of the free</strong>, plus...</li>
-            <li>Get an alert when any story you're tracking hits <strong>50th</strong> place or higher.</li>
-            <li>Track all of the <strong>hidden</strong> genres Rising Stars lists (dungeon, time-travel, xianxia, gender-bender, etc).</li>
-            <li>View advanced analytics, such as highest rank over time.</li>
-        </ul>
+            <div class="card-group mt-3 mt-lg-5">
+                <div class="card border-dark p-5">
+                    <h4 class="card-title p-2 mb-3 text-center">Free Features</h4>
+                    <ul>
+                        <li>Track any story you like, as many stories as you like.</li>
+                        <li>Get an alert when any story you're tracking hits <strong>20th</strong> place or higher.</li>
+                        <li>Track all of the <strong>standard</strong> genre Rising Stars lists (action, comedy, romance, etc), as well as the Main list itself.</li>
+                    </ul>
+                </div>
+                    
+                <div class="card border-dark p-5">
+                    <h4 class="card-title p-2 mb-3 text-center">Patron Features</h4>
+                    <ul>
+                        <li><strong>All of the free</strong>, plus...</li>
+                        <li>Get an alert when any story you're tracking hits <strong>50th</strong> place or higher.</li>
+                        <li>Track all of the <strong>hidden</strong> genres Rising Stars lists (dungeon, time-travel, xianxia, gender-bender, etc).</li>
+                        <li>View advanced analytics, such as highest rank over time.</li>
+                    </ul>
 
-        <div class="card-group">
-            <div class="card border-light justify-content-center">
-                <img src="{{ asset('assets/images/ranking.png') }}" class="card-img-top mx-center" alt="...Help you.">
+                    <div class="card-group">
+                        <div class="card border-light justify-content-center">
+                            <img src="{{ asset('assets/images/ranking.png') }}" class="card-img-top mx-center" data-bs-toggle="modal" data-bs-target="#rankingModal" style="cursor: pointer;" alt="Ranking photo thumbnail">
+                            <div class="modal fade" id="rankingModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-body text-center">
+                                            <img src="{{ asset('assets/images/ranking.png') }}" class="img-fluid" alt="Ranking photo">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            
+                        <div class="card border-light justify-content-center">
+                            <img src="{{ asset('assets/images/ratings.png') }}" class="card-img-top mx-center" data-bs-toggle="modal" data-bs-target="#ratingsModal" style="cursor: pointer;" alt="Ratings photo thumbnail">
+                            <div class="modal fade" id="ratingsModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-body text-center">
+                                            <img src="{{ asset('assets/images/ratings.png') }}" class="img-fluid" alt="Ratings photo">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-                
-            <div class="card border-light justify-content-center">
-                <img src="{{ asset('assets/images/ratings.png') }}" class="card-img-top mx-center" alt="...Help you.">
-            </div>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 </div>

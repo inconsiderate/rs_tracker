@@ -105,6 +105,8 @@ final class CheckStarsListsHandler
                 $crawler = new Crawler($htmlContent);
                 $storyName = $crawler->filter('.fic-title h1')->text();
                 $authorName = $crawler->filter('.fic-title h4 a')->text();
+                $blurb = $crawler->filter('.fiction-info .description')->text();
+                $trimmedBlurb = preg_replace('/\s+?(\S+)?$/', '', substr($blurb, 0, 130));
                 $authorProfileUrl = $crawler->filter('.fic-title h4 a')->attr('href');
                 preg_match('/\/profile\/(\d+)/', $authorProfileUrl, $authorProfileMatches);
                 $authorId = $authorProfileMatches[1] ?? null;
@@ -117,6 +119,7 @@ final class CheckStarsListsHandler
                 $newStory->setStoryAddress($match['storyAddress']);
                 $newStory->setStoryAuthorId($authorId);
                 $newStory->setStoryAuthor($authorName);
+                $newStory->setBlurb($trimmedBlurb . '...');
                 $this->entityManager->persist($newStory);
             }
         }
@@ -136,20 +139,36 @@ final class CheckStarsListsHandler
     {
         $matches = [];
         $crawler->filter('.fiction-list .fiction-list-item')->each(function (Crawler $node, $position) use (&$matches) {
-            // Extract the link etc
+            // grab the link
             $link = $node->filter('a')->link();
-            $url = $link->getUri(); // 
+            $url = $link->getUri(); 
             
+            // grab story id
+            $storyId = null;
             if (preg_match('/\/fiction\/(\d+)\//', $url, $idMatch)) {
                 $storyId = $idMatch[1];
             }
-
+        
+            // followers count
+            $followersText = $node->filter(".fa-users + span")->text('0');
+            $followers = (int) filter_var($followersText, FILTER_SANITIZE_NUMBER_INT);
+            
+            // pages count
+            $pagesText = $node->filter(".fa-book + span")->text('0');
+            $pages = (int) filter_var($pagesText, FILTER_SANITIZE_NUMBER_INT);
+            
+            // views count
+            $viewsText = $node->filter(".fa-eye + span")->text('0');
+            $views = (int) filter_var($viewsText, FILTER_SANITIZE_NUMBER_INT);
+            
             if (strpos($url, '/fiction/') !== false) {
-                // Add the match to the list
-                $matches[] = [
+                $matches[$storyId] = [
                     'storyAddress' => $url,
-                    'position' => $position + 1, 
-                    'storyId' => $storyId
+                    'position' => $position + 1,
+                    'storyId' => $storyId,
+                    'followers' => $followers,
+                    'pages' => $pages,
+                    'views' => $views
                 ];
             }
         });
@@ -211,6 +230,9 @@ final class CheckStarsListsHandler
                 $newEntry->setHighestPosition($position);
                 $newEntry->setDate(new \DateTime());
                 $newEntry->setActive(1);
+                $newEntry->setStartFollowerCount($match['followers']);
+                $newEntry->setStartPageCount($match['pages']);
+                $newEntry->setStartViewCount($match['views']);
                 $newEntries[] = $newEntry;
             }
 
@@ -257,15 +279,18 @@ final class CheckStarsListsHandler
         $activeEntries = $this->entityManager->getRepository(RSMatch::class)
             ->findBy(['active' => 1, 'genre' => $genre]);
 
-        $this->deactivateUnmatchedEntries($activeEntries, $storyIds);
+        $this->deactivateUnmatchedEntries($activeEntries, $storyIds, $matches);
         $this->entityManager->flush();
     }
     
-    private function deactivateUnmatchedEntries($activeEntries, $matchedIds)
+    private function deactivateUnmatchedEntries($activeEntries, $matchedIds, $matches)
     {
         foreach ($activeEntries as $entry) {
             if (!in_array($entry->getStoryID()->getStoryId(), $matchedIds)) {
                 $entry->setActive(0);
+                // $entry->setEndFollowerCount($matches[$entry->getStoryID()->getStoryId()]['followers']);
+                // $entry->setEndPageCount($matches[$entry->getStoryID()->getStoryId()]['pages']);
+                // $entry->setEndViewCount($matches[$entry->getStoryID()->getStoryId()]['views']);
                 $entry->setRemovedDate(new \DateTime());
             }
         }

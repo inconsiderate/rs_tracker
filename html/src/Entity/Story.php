@@ -49,6 +49,9 @@ class Story
     #[ORM\OneToMany(targetEntity: RSDaily::class, mappedBy: 'story', orphanRemoval: true)]
     private Collection $rSDailies;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $blurb = null;
+
     public function __construct()
     {
         $this->rSMatches = new ArrayCollection();
@@ -201,6 +204,18 @@ class Story
                 $rSDaily->setStory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBlurb(): ?string
+    {
+        return $this->blurb;
+    }
+
+    public function setBlurb(?string $blurb): static
+    {
+        $this->blurb = $blurb;
 
         return $this;
     }
