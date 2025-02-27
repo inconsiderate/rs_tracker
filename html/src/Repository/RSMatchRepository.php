@@ -183,20 +183,29 @@ class RSMatchRepository extends ServiceEntityRepository
 
     private function calculateDurationString(\DateTime $startDate, \DateTime $endDate): string
     {
-        $duration = $startDate->diff($endDate);
+        $totalSeconds = $endDate->getTimestamp() - $startDate->getTimestamp();
+    
+        $days = floor($totalSeconds / 86400);
+        $totalSeconds %= 86400;
+    
+        $hours = floor($totalSeconds / 3600);
+        $totalSeconds %= 3600;
+    
+        $minutes = floor($totalSeconds / 60);
+        $seconds = $totalSeconds % 60;
     
         $durationParts = [];
-        if ($duration->days > 0) {
-            $durationParts[] = $duration->days . ' day' . ($duration->days > 1 ? 's' : '');
+        if ($days > 0) {
+            $durationParts[] = $days . ' day' . ($days > 1 ? 's' : '');
         }
-        if ($duration->h > 0) {
-            $durationParts[] = $duration->h . ' hour' . ($duration->h > 1 ? 's' : '');
+        if ($hours > 0) {
+            $durationParts[] = $hours . ' hour' . ($hours > 1 ? 's' : '');
         }
-        if ($duration->days == 0 && $duration->i > 0) {
-            $durationParts[] = $duration->i . ' minute' . ($duration->i > 1 ? 's' : '');
+        if ($minutes > 0) {
+            $durationParts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
         }
-        if (empty($durationParts) && $duration->s > 0) {
-            $durationParts[] = $duration->s . ' second' . ($duration->s > 1 ? 's' : '');
+        if ($seconds > 0) {
+            $durationParts[] = $seconds . ' second' . ($seconds > 1 ? 's' : '');
         }
     
         return implode(' ', $durationParts);

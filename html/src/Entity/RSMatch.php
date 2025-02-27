@@ -353,34 +353,35 @@ class RSMatch
 
     public function getTimeOnList(): ?string
     {
-        $endDate = $this->removedDate;
-        if (!$endDate) {
-            $endDate = new \DateTime();
-        }
+        $endDate = $this->removedDate ?? new \DateTime();
+        $totalSeconds = $endDate->getTimestamp() - $this->date->getTimestamp();
     
-        $interval = $this->date->diff($endDate);
+        $days = floor($totalSeconds / 86400);
+        $totalSeconds %= 86400;
     
-        // Build the output string based on the available parts
+        $hours = floor($totalSeconds / 3600);
+        $totalSeconds %= 3600;
+    
+        $minutes = floor($totalSeconds / 60);
+        $seconds = $totalSeconds % 60;
+    
         $parts = [];
-        if ($interval->d > 0) {
-            $parts[] = $interval->d . ' day' . ($interval->d > 1 ? 's' : '');
+        if ($days > 0) {
+            $parts[] = $days . ' day' . ($days > 1 ? 's' : '');
         }
-        if ($interval->h > 0) {
-            $parts[] = $interval->h . ' hour' . ($interval->h > 1 ? 's' : '');
+        if ($hours > 0) {
+            $parts[] = $hours . ' hour' . ($hours > 1 ? 's' : '');
         }
-        // Only include minutes if less than 1 day
-        if ($interval->d === 0 && $interval->i > 0) { 
-            $parts[] = $interval->i . ' minute' . ($interval->i > 1 ? 's' : '');
+        if ($minutes > 0) {
+            $parts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
         }
-    
-        // If no days, hours, or minutes, fall back to seconds
-        if (empty($parts) && $interval->s > 0) {
-            $parts[] = $interval->s . ' second' . ($interval->s > 1 ? 's' : '');
+        if ($seconds > 0 && empty($parts)) { // Only show seconds if no higher unit is used
+            $parts[] = $seconds . ' second' . ($seconds > 1 ? 's' : '');
         }
     
-        // Join the parts with a space
         return implode(' ', $parts);
     }
+    
 
     public function getMatchEmailSent(): ?array
     {
