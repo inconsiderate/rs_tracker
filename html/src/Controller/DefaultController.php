@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DefaultController extends AbstractController
 {     
@@ -49,6 +51,7 @@ class DefaultController extends AbstractController
             $feedItem['author'] = $item['story']->getStoryAuthor();
             $feedItem['url'] = $item['story']->getStoryAddress();
             $feedItem['id'] = $item['story']->getStoryID();
+            $feedItem['internalId'] = $item['story']->getId();
             $feedItem['rank'] = $item['rank'];
             $feedItem['blurb'] = $item['blurb'];
             $feedItem['genre'] = RSMatch::getHumanReadableName($item['genre']);
@@ -298,7 +301,7 @@ class DefaultController extends AbstractController
     }
 
     #[Route('/refresh/{id}', name: 'refresh_story', methods: ['GET'])]
-    public function app_story_refresh(int $id, EntityManagerInterface $entityManager): Response
+    public function app_story_refresh(int $id, EntityManagerInterface $entityManager, RequestStack $requestStack): Response
     {
         // Check if the user is logged in
         $user = $this->getUser();
@@ -335,6 +338,13 @@ class DefaultController extends AbstractController
             $entityManager->flush();
 
         $this->addFlash('success', $storyName . ' has been refreshed');
+        $referer = $requestStack->getCurrentRequest()->headers->get('referer');
+
+        if ($referer) {
+            return new RedirectResponse($referer);
+        }
+    
+        // Fallback if no referer is available
         return $this->redirectToRoute('app_trackers_edit');
     }
 }

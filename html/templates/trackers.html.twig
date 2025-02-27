@@ -11,7 +11,7 @@
 
 <div class="card-group mt-3 mt-lg-5">
     <div class="card border-dark">
-        <h2 class="card-title p-3 mb-0">RS List History</h2>
+        <h2 class="card-title p-3 mb-0">RS List History {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}(All Lists){% endif %}</h2>
         <div class="card-body">
             <table class="table">
                 <table class="table table-responsive" id="genreTable">
@@ -34,6 +34,17 @@
                             <td data-order="{{item.timeOnListInt}}">{{item.timeOnList}} </td>
                         </tr>
                     {% endfor %}
+                    {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}
+                    {% for item in tagMatches %}
+                        <tr>
+                            <td data-order="{{item.date|date('Ymd')}}">{{item.date|date("M d, Y H:i")}}</td>
+                            <td>{{item.storyName}}</td>
+                            <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
+                            <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
+                            <td data-order="{{item.timeOnListInt}}">{{item.timeOnList}} </td>
+                        </tr>
+                    {% endfor %}
+                    {% endif %}
                     </tbody>
                     <tfoot>
                         <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on this list!</td>
@@ -42,45 +53,7 @@
             </div>
         </div>    
     </div>
-
-
-
-
-    {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}
-    <div class="card-group mt-3 mt-lg-5">
-        <div class="card border-dark">
-            <h2 class="card-title p-3 mb-0">Secret RS List History</h2>
-            <div class="card-body">
-                    <table class="table table-responsive" id="tagTable">
-                        <thead>
-                            <tr>
-                                <th>Entered List</th>
-                                <th>Story Title</th>
-                                <th>RS List</th>
-                                <th>Highest Position</th>
-                                <th>Consecutive<br/>Time on RS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for item in tagMatches %}
-                            <tr>
-                                <td data-order="{{item.date}}">{{item.date|date("Y-m-d H:i")}}</td>
-                                <td>{{item.storyName}}</td>
-                                <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
-                                <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
-                                <td data-order="{{item.timeOnListInt}}">{{item.timeOnList}} </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on this list!</td>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>    
-        </div>
-    </div>    
-    {% endif %}
+  
 
     {% if not app.user.isSubscribed %}
     <div class="card-group mt-3 mt-lg-3">
