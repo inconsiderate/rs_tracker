@@ -27,11 +27,11 @@
                     <tbody>
                     {% for item in genreMatches %}
                         <tr>
-                            <td>{{item.date|date("Y-m-d H:i")}}</td>
+                            <td data-order="{{item.date|date('Ymd')}}">{{item.date|date("M d, Y H:i")}}</td>
                             <td>{{item.storyName}}</td>
                             <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
                             <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
-                            <td>{{item.timeOnList}} </td>
+                            <td data-order="{{item.timeOnListInt}}">{{item.timeOnList}} </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -64,11 +64,11 @@
                         <tbody>
                         {% for item in tagMatches %}
                             <tr>
-                                <td>{{item.date|date("Y-m-d H:i")}}</td>
+                                <td data-order="{{item.date}}">{{item.date|date("Y-m-d H:i")}}</td>
                                 <td>{{item.storyName}}</td>
                                 <td><a href="{{item.rsLink}}">{{item.genre|capitalize}}</a></td>
                                 <td>{{item.highestPosition}} {% if item.active %}<i class="fa fa-star"></i>{% endif %}</td>
-                                <td>{{item.timeOnList}} </td>
+                                <td data-order="{{item.timeOnListInt}}">{{item.timeOnList}} </td>
                             </tr>
                         {% endfor %}
                         </tbody>

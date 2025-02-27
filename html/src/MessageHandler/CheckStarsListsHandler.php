@@ -119,7 +119,7 @@ final class CheckStarsListsHandler
                 $newStory->setStoryAddress($match['storyAddress']);
                 $newStory->setStoryAuthorId($authorId);
                 $newStory->setStoryAuthor($authorName);
-                $newStory->setBlurb($trimmedBlurb . '...');
+                $newStory->setBlurb($trimmedBlurb);
                 $this->entityManager->persist($newStory);
             }
         }

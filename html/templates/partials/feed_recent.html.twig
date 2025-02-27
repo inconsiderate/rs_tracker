@@ -9,7 +9,7 @@
                     {% for item in recentFeedItems|slice(0, 20) %}
                     <p class="card-text col-sm-6 p-3 pb-0"><a href="/search/{{item['id']}}">{{item['name']}}</a> ( <a href="{{item['url']}}"><i class="fa-solid fa-r"></i><i class="fa-solid fa-r"></i></a> )
                     <br/>Ranked {{item['rank']}} in <strong>{{item['genre']|replace({'_': ' '})|title}}</strong> {{item['duration']}} ago
-                    <br/><em>{{item['blurb']}}</em></p>
+                    <br/><em>{{item['blurb']}}...</em></p>
                     {% endfor %}
                 </div>
             </div>

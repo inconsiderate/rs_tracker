@@ -119,6 +119,7 @@ class DefaultController extends AbstractController
                         'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
                         'highestPosition' => $entry->getHighestPosition(),
                         'timeOnList' => $entry->getTimeOnList(),
+                        'timeOnListInt' => $entry->getTimeOnListInt(),
                         'active' => $entry->isActive(),
                     ];
                     $genreData[$entry->getStoryID()->getStoryName()][] = [
@@ -136,6 +137,7 @@ class DefaultController extends AbstractController
                         'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
                         'highestPosition' => $entry->getHighestPosition(),
                         'timeOnList' => $entry->getTimeOnList(),
+                        'timeOnListInt' => $entry->getTimeOnListInt(),
                         'active' => $entry->isActive(),
                     ];
 

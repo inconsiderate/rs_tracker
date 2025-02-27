@@ -344,6 +344,13 @@ class RSMatch
         return $this;
     }
 
+    public function getTimeOnListInt(): ?int
+    {
+        $endDate = $this->removedDate ?? new \DateTime();
+
+        return $endDate->getTimestamp() - $this->date->getTimestamp();
+    }
+
     public function getTimeOnList(): ?string
     {
         $endDate = $this->removedDate;
