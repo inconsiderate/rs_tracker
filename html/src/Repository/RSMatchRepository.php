@@ -26,17 +26,93 @@ class RSMatchRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    
+    
+    public function findStoryWithFollowersRecord($genre): ?array
+    {
+        $qb = $this->createQueryBuilder('r');
 
-    public function findStoryWithLongestTimeAtNumberOne($genre): ?array
+        $qb->select('r', 's')
+           ->leftJoin('r.storyID', 's')
+           ->andWhere('r.genre = :genre')
+           ->setParameter('genre', $genre)
+           ->andWhere('r.startFollowerCount > 0')
+           ->orderBy('r.startFollowerCount', 'ASC')
+           ->setMaxResults(1);
+    
+        $result = $qb->getQuery()->getResult();
+    
+        if (!empty($result)) {
+            $story = $result[0];
+    
+            return [
+                'story' => $story->getStoryID(),
+                'count' => $story->getStartFollowerCount(),
+            ];
+        }
+        
+        return [];
+    }
+    public function findStoryWithViewsRecord($genre): ?array
+    {
+        $qb = $this->createQueryBuilder('r');
+
+        $qb->select('r', 's')
+           ->leftJoin('r.storyID', 's')
+           ->andWhere('r.genre = :genre')
+           ->setParameter('genre', $genre)
+           ->andWhere('r.startViewCount > 0')
+           ->orderBy('r.startViewCount', 'ASC')
+           ->setMaxResults(1);
+    
+        $result = $qb->getQuery()->getResult();
+    
+        if (!empty($result)) {
+            $story = $result[0];
+    
+            return [
+                'story' => $story->getStoryID(),
+                'count' => $story->getStartViewCount(),
+            ];
+        }
+        
+        return [];
+    }
+    public function findStoryWithPagesRecord($genre): ?array
+    {
+        $qb = $this->createQueryBuilder('r');
+
+        $qb->select('r', 's')
+           ->leftJoin('r.storyID', 's')
+           ->andWhere('r.genre = :genre')
+           ->setParameter('genre', $genre)
+           ->andWhere('r.startPageCount > 0')
+           ->orderBy('r.startPageCount', 'ASC')
+           ->setMaxResults(1);
+    
+        $result = $qb->getQuery()->getResult();
+    
+        if (!empty($result)) {
+            $story = $result[0];
+    
+            return [
+                'story' => $story->getStoryID(),
+                'count' => $story->getStartPageCount(),
+            ];
+        }
+        
+        return [];
+    }
+
+    public function findStoryWithLongestTimeOnRS($genre): ?array
     {
         $qb = $this->createQueryBuilder('r');
 
         $qb->select('r', 's') 
            ->leftJoin('r.storyID', 's') 
-           ->where('r.highestPosition = 1')
            ->andWhere('r.genre = :genre')
-           ->setParameter('genre', $genre) 
-           ->orderBy('r.date', 'ASC');
+           ->setParameter('genre', $genre);
         
         $result = $qb->getQuery()->getResult();
         
