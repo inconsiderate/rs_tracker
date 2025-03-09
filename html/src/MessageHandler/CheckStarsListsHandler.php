@@ -204,7 +204,7 @@ final class CheckStarsListsHandler
             $sendEmail = false;
             $storyEntity = $existingStoriesMap[$storyId];
             $existingEntry = $this->entityManager->getRepository(RSMatch::class)
-                ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
+                ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' > 0]);
     
             if ($existingEntry) {
                 if ($existingEntry->getHighestPosition() > $position) {
@@ -229,7 +229,7 @@ final class CheckStarsListsHandler
                 $newEntry->setGenre($genre);
                 $newEntry->setHighestPosition($position);
                 $newEntry->setDate(new \DateTime());
-                $newEntry->setActive(1);
+                $newEntry->setActive(5);
                 $newEntry->setStartFollowerCount($match['followers']);
                 $newEntry->setStartPageCount($match['pages']);
                 $newEntry->setStartViewCount($match['views']);
@@ -277,7 +277,7 @@ final class CheckStarsListsHandler
         }
     
         $activeEntries = $this->entityManager->getRepository(RSMatch::class)
-            ->findBy(['active' => 1, 'genre' => $genre]);
+            ->findBy(['active' > 0, 'genre' => $genre]);
 
         $this->deactivateUnmatchedEntries($activeEntries, $storyIds, $matches);
         $this->entityManager->flush();
@@ -287,11 +287,12 @@ final class CheckStarsListsHandler
     {
         foreach ($activeEntries as $entry) {
             if (!in_array($entry->getStoryID()->getStoryId(), $matchedIds)) {
-                $entry->setActive(0);
-                // $entry->setEndFollowerCount($matches[$entry->getStoryID()->getStoryId()]['followers']);
-                // $entry->setEndPageCount($matches[$entry->getStoryID()->getStoryId()]['pages']);
-                // $entry->setEndViewCount($matches[$entry->getStoryID()->getStoryId()]['views']);
-                $entry->setRemovedDate(new \DateTime());
+                $newActiveValue = $entry->active - 1;
+                $entry->setActive($newActiveValue);
+                
+                if ($newActiveValue < 1) {
+                    $entry->setRemovedDate(new \DateTime());
+                }
             }
         }
     }

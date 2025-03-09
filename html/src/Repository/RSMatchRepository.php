@@ -184,7 +184,7 @@ class RSMatchRepository extends ServiceEntityRepository
     private function calculateDurationString(\DateTime $startDate, \DateTime $endDate): string
     {
         $totalSeconds = $endDate->getTimestamp() - $startDate->getTimestamp();
-    
+
         $days = floor($totalSeconds / 86400);
         $totalSeconds %= 86400;
     
@@ -204,7 +204,8 @@ class RSMatchRepository extends ServiceEntityRepository
         if ($minutes > 0) {
             $durationParts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
         }
-        if ($seconds > 0) {
+        // Only add seconds if no minutes or longer are present
+        if ($seconds > 0 && empty($durationParts)) {
             $durationParts[] = $seconds . ' second' . ($seconds > 1 ? 's' : '');
         }
     
