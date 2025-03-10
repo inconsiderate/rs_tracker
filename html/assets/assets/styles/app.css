@@ -12,3 +12,145 @@ body {
 [data-bs-theme=light] .card-title {
     background-color: #c1e0ff40;
 }
+
+
+.letter-input:focus {
+    outline: none;
+    background-color: #e0e0e0;
+}
+
+#keyboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.letter-input {
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.letter-input:hover {
+    background-color: #ddd;
+}
+
+#enter-key {
+    width: 80px;
+    background-color: #4CAF50;
+    color: white;
+}
+
+#delete-key {
+    width: 80px;
+    background-color: #f44336;
+    color: white;
+}
+
+#guess-input {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    padding: 10px;
+}
+
+
+
+.guess-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.result-letter {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid black;
+    text-transform: uppercase;
+}
+
+#previous-guesses,
+#current-guess-container {
+    display: grid;
+    justify-content: center;
+    gap: 5px;
+    justify-items: center;
+}
+#current-guess-container {    
+    gap: 10px;
+}
+
+.results-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-row {
+    display: flex;
+    justify-content: center;
+}
+
+
+.result-row span {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px; /* Center text vertically */
+    font-size: 20px;
+    font-weight: bold;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+input.letter-input {
+    width: 50px;  /* Same width as the guess boxes */
+    height: 50px; /* Same height as the guess boxes */
+    text-align: center;
+    font-size: 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+#keyboard .letter-input.absent {
+    background-color: #313131;
+    color: beige;
+}
+.letter-input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.5em;
+    margin: 2px;
+}
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+}
+.keyboard-row .letter-input {
+    width: 50px;
+    font-size: 1.2em;
+    margin: 5px;
+}
+.correct {
+    background-color: green;
+    color: black;
+}
+.present {
+    background-color: yellow;
+    color: black;
+}
+.absent {
+    background-color: gray;
+    color: black;
+}

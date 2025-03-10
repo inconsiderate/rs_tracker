@@ -204,7 +204,7 @@ final class CheckStarsListsHandler
             $sendEmail = false;
             $storyEntity = $existingStoriesMap[$storyId];
             $existingEntry = $this->entityManager->getRepository(RSMatch::class)
-                ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' > 0]);
+                ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
     
             if ($existingEntry) {
                 if ($existingEntry->getHighestPosition() > $position) {
@@ -235,7 +235,6 @@ final class CheckStarsListsHandler
                 $newEntry->setStartViewCount($match['views']);
                 $newEntries[] = $newEntry;
             }
-
             $userList = $storyEntity->getUsers();
             foreach ($userList as $user) {
 
@@ -277,7 +276,12 @@ final class CheckStarsListsHandler
         }
     
         $activeEntries = $this->entityManager->getRepository(RSMatch::class)
-            ->findBy(['active' > 0, 'genre' => $genre]);
+        ->createQueryBuilder('r')
+        ->where('r.active > 0')
+        ->andWhere('r.genre = :genre')
+        ->setParameter('genre', $genre)
+        ->getQuery()
+        ->getResult();
 
         $this->deactivateUnmatchedEntries($activeEntries, $storyIds, $matches);
         $this->entityManager->flush();
@@ -287,12 +291,12 @@ final class CheckStarsListsHandler
     {
         foreach ($activeEntries as $entry) {
             if (!in_array($entry->getStoryID()->getStoryId(), $matchedIds)) {
-                $newActiveValue = $entry->active - 1;
+                $newActiveValue = $entry->getActive() - 1;
                 $entry->setActive($newActiveValue);
-                
                 if ($newActiveValue < 1) {
                     $entry->setRemovedDate(new \DateTime());
                 }
+            $this->entityManager->persist($entry);
             }
         }
     }

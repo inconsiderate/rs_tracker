@@ -1,0 +1,239 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Wordle Game{% endblock %}
+
+{% block body %}
+<div class="card-group support mt-3 mt-lg-5">
+    <div class="card border-dark">
+        <div class="card-title p-3">
+            <h1>litRPG / Cultivation Wordle</h1>
+        </div>
+
+        <div class="card-body">
+            {% if solvedMessage is defined %}
+            <div class="alert alert-success">
+                {{ solvedMessage }}
+            </div>
+            {% else %}
+                <h2 id="system-messages" align="center" style="margin-bottom: 20px;"></h2>
+                <div id="previous-guesses" style="margin-bottom: 20px;"></div>
+                <div id="current-guess-container"></div>
+
+                <button class="d-none" id="submit-guess">Submit</button>
+                
+                <div id="keyboard">
+                    <div class="keyboard-row">
+                        <button class="letter-input">Q</button>
+                        <button class="letter-input">W</button>
+                        <button class="letter-input">E</button>
+                        <button class="letter-input">R</button>
+                        <button class="letter-input">T</button>
+                        <button class="letter-input">Y</button>
+                        <button class="letter-input">U</button>
+                        <button class="letter-input">I</button>
+                        <button class="letter-input">O</button>
+                        <button class="letter-input">P</button>
+                    </div>
+                    <div class="keyboard-row">
+                        <button class="letter-input">A</button>
+                        <button class="letter-input">S</button>
+                        <button class="letter-input">D</button>
+                        <button class="letter-input">F</button>
+                        <button class="letter-input">G</button>
+                        <button class="letter-input">H</button>
+                        <button class="letter-input">J</button>
+                        <button class="letter-input">K</button>
+                        <button class="letter-input">L</button>
+                    </div>
+                    <div class="keyboard-row">
+                        <button id="enter-key" class="letter-input">Enter</button>
+                        <button class="letter-input">Z</button>
+                        <button class="letter-input">X</button>
+                        <button class="letter-input">C</button>
+                        <button class="letter-input">V</button>
+                        <button class="letter-input">B</button>
+                        <button class="letter-input">N</button>
+                        <button class="letter-input">M</button>
+                        <button id="delete-key" class="letter-input">Delete</button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let wordLength = 5; // Default value
+    let gameOver = false;
+    let previousGuesses = JSON.parse(localStorage.getItem('previousGuesses')) || [];
+
+    function createGuessInputBoxes(wordLength) {
+        const currentGuessContainer = document.getElementById("current-guess-container");
+        currentGuessContainer.innerHTML = '';  
+
+        for (let i = 0; i < wordLength; i++) {
+            const inputBox = document.createElement("input");
+            inputBox.type = "text";
+            inputBox.maxLength = "1";
+            inputBox.classList.add("letter-input");
+            inputBox.disabled = gameOver;  // Disable if game is over
+            currentGuessContainer.appendChild(inputBox);
+        }
+    }
+
+    function resetGame() {
+        localStorage.removeItem('previousGuesses'); // Ensure guesses are wiped
+        localStorage.removeItem('gameStatus'); // Reset game status
+        gameOver = false;
+        previousGuesses = [];
+
+        document.getElementById("previous-guesses").innerHTML = '';
+        document.getElementById("current-guess-container").innerHTML = '';
+
+        console.log("Game reset for a new day, no guesses yet");
+    }
+
+    function updatePreviousGuesses() {
+        const previousGuessesContainer = document.getElementById("previous-guesses");
+        previousGuessesContainer.innerHTML = ''; 
+
+        previousGuesses.forEach(guessArray => {  
+            const row = document.createElement("div");
+            row.style.display = "grid";
+            row.style.gridTemplateColumns = `repeat(${wordLength}, 1fr)`;
+            row.style.gap = "5px";
+
+            guessArray.forEach(({ letter, status }) => {  
+                const inputBox = document.createElement("input");
+                inputBox.type = "text";
+                inputBox.value = letter;
+                inputBox.classList.add("letter-input", status);  
+                inputBox.setAttribute('readonly', true);
+                row.appendChild(inputBox);
+
+                // If the status is "absent", add the "absent" class to the corresponding button
+                if (status === "absent") {
+                    const buttons = document.querySelectorAll(".letter-input");
+                    buttons.forEach(button => {
+                        if (button.innerText.trim().toUpperCase() === letter.toUpperCase()) {
+                            button.classList.add("absent");
+                        }
+                    });
+                }
+
+            });
+
+            previousGuessesContainer.appendChild(row);
+        });
+    }
+
+    fetch("{{ path('wordle_game') }}")
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.message) {
+                document.getElementById("system-messages").innerHTML = data.message;
+            }
+
+            if (data.error) {
+                document.getElementById("results").innerText = data.error;
+                return;
+            }
+
+            const storedGameStatus = localStorage.getItem('gameStatus');
+
+            // **Clear local storage if the backend indicates a new game**
+            if (data.status === "ready" || data.remainingGuesses == 6) {
+                resetGame();
+            }
+
+            // **Update localStorage with the new game status from the backend**
+            localStorage.setItem('gameStatus', data.status);
+
+            wordLength = data.wordLength || 5;
+            
+            document.getElementById("current-guess-container").style.gridTemplateColumns = `repeat(${wordLength}, 50px)`;
+            createGuessInputBoxes(wordLength);
+            
+            // Restore previous guesses from local storage
+            const storedGuesses = localStorage.getItem('previousGuesses');
+            if (storedGuesses) {
+                previousGuesses = JSON.parse(storedGuesses);
+                updatePreviousGuesses();
+            }
+        });
+
+    document.getElementById("enter-key").addEventListener("click", function () {
+        if (gameOver) {
+            alert("Game is already over for today.");
+            return;
+        }
+
+        const guessInput = Array.from(document.querySelectorAll('#current-guess-container .letter-input'))
+            .map(input => input.value.toUpperCase()).join('');
+
+        if (guessInput.length !== wordLength) {
+            alert("Please enter a complete word.");
+            return;
+        }
+
+        fetch("{{ path('wordle_guess') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guess: guessInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            previousGuesses.push([...data.result]);  
+            localStorage.setItem('previousGuesses', JSON.stringify(previousGuesses));
+
+            if (data.gameOver) {
+                alert(data.message);
+                gameOver = true;
+                localStorage.setItem('gameStatus', 'done');
+            }
+
+            updatePreviousGuesses();
+        });
+
+        document.querySelectorAll('#current-guess-container .letter-input').forEach(input => input.value = '');
+    });
+
+    document.querySelectorAll(".letter-input").forEach(button => {
+        button.addEventListener("click", function () {
+            // Ignore clicks on "Enter" and "Delete" buttons
+            if (this.id === "enter-key" || this.id === "delete-key") return;
+
+            const currentInputs = document.querySelectorAll("#current-guess-container .letter-input");
+            for (let i = 0; i < currentInputs.length; i++) {
+                if (currentInputs[i].value === "") {
+                    currentInputs[i].value = this.innerText;
+                    break;
+                }
+            }
+        });
+    });
+
+    // Backspace functionality for the delete button
+    document.getElementById("delete-key").addEventListener("click", function () {
+        const currentInputs = document.querySelectorAll("#current-guess-container .letter-input");
+        for (let i = currentInputs.length - 1; i >= 0; i--) {
+            if (currentInputs[i].value !== "") {
+                currentInputs[i].value = "";
+                break;
+            }
+        }
+    });
+
+
+});
+
+
+</script>
+{% endblock %}

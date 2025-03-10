@@ -123,7 +123,7 @@ class DefaultController extends AbstractController
                         'highestPosition' => $entry->getHighestPosition(),
                         'timeOnList' => $entry->getTimeOnList(),
                         'timeOnListInt' => $entry->getTimeOnListInt(),
-                        'active' => $entry->isActive(),
+                        'active' => $entry->getActive(),
                     ];
                     $genreData[$entry->getStoryID()->getStoryName()][] = [
                         'rank' => $entry->getHighestPosition(),
@@ -141,7 +141,7 @@ class DefaultController extends AbstractController
                         'highestPosition' => $entry->getHighestPosition(),
                         'timeOnList' => $entry->getTimeOnList(),
                         'timeOnListInt' => $entry->getTimeOnListInt(),
-                        'active' => $entry->isActive(),
+                        'active' => $entry->getActive(),
                     ];
 
                     $tagData[$entry->getStoryID()->getStoryName()][] = [
@@ -196,6 +196,19 @@ class DefaultController extends AbstractController
         return $this->render('support.html.twig');
     }
     
+    
+    #[Route('/terms-of-service', name: 'app_service')]
+    public function app_service(): Response
+    {
+        return $this->render('profile/service.html.twig');
+    }
+
+    #[Route('/privacy-policy', name: 'app_privacy')]
+    public function app_privacy(): Response
+    {
+        return $this->render('profile/privacy.html.twig');
+    }
+
     // create a new story and display existing stories
     #[Route('/trackers/edit', name: 'app_trackers_edit')]
     public function app_trackers_edit(Request $request, EntityManagerInterface $entityManager): Response

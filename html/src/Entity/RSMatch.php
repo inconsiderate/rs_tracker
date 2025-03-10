@@ -234,8 +234,8 @@ class RSMatch
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\Column(type: 'smallint', options: ['unsigned' => true, 'default' => 0])]
-    private int $active;
+    #[ORM\Column(type: 'smallint', nullable: true)]
+    private ?int $active;
 
     #[ORM\Column(nullable: true)]
     private ?int $highestPosition = null;
@@ -296,7 +296,7 @@ class RSMatch
         return $this;
     }
 
-    public function isActive(): ?int
+    public function getActive(): ?int
     {
         return $this->active;
     }
