@@ -1,13 +1,20 @@
 <div class="card mt-5">
     <h2 class="pt-3 text-center"><i class="fa fa-meteor fa-rotate-180"></i> Highest Rank by Date <i class="fa fa-meteor fa-rotate-90"></i></h2>
-    <p class="card-text text-center mb-4" style="font-size: small;">WARNING: Data from before April 24 will be WRONG, it will be purged at the end of the month.</p>
+    <p class="card-text text-center mb-4" style="font-size: small;">NOTICE: This graph was just rebuilt from scratch to be more accurate, data from before April 24, 2025 is not to be trusted.</p>
 
     <div class="col-12">
         <div class="card-title p-md-2 mb-0">
             <div class="card-body p-md-2">
                 <div class="row">
                     {% if app.user and app.user.isSubscribed %}
-                        <canvas id="rankingChart"></canvas>
+                    <div style="position: relative; width: 100%;">
+                        <canvas id="rankingChart" width="100%"></canvas>
+                        <div style="display: flex;justify-content: flex-end;gap: 1rem;margin-top: 1rem;font-family: sans-serif;align-items: center;">
+                            <input type="date" id="startDate" style="padding: 6px 10px;border: 1px solid #ccc;border-radius: 6px;font-size: 14px;">
+                            <label for="endDate" style="font-weight: bold;">To</label>
+                            <input type="date" id="endDate" style="padding: 6px 10px;border: 1px solid #ccc;border-radius: 6px;font-size: 14px;">
+                        </div>
+                    </div>
                     {% else %}
                         {% include 'partials/_ad_unlock_block.html.twig' %}
                     {% endif %}
@@ -18,76 +25,81 @@
 </div>
 
 <script>
-(async function () {
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const today = new Date();
+    const prior = new Date();
+    prior.setDate(today.getDate() - 6);
 
-  const storyRankings = {{ genreDailyData|raw }}; 
-  // Prepare data for each genre across stories
-  const datasets = [];
+    const formatDate = date => date.toISOString().split('T')[0];
 
-  // Iterate through each story
-  for (const story in storyRankings) {
-    // Group by genre
-    const groupedByGenre = storyRankings[story].reduce((acc, entry) => {
-      if (!acc[entry.genre]) {
-        acc[entry.genre] = [];
-      }
-      acc[entry.genre].push({
-        day: entry.day,
-        rank: entry.rank,
-      });
-      return acc;
-    }, {});
+    startInput.value = formatDate(prior);
+    endInput.value = formatDate(today);
 
-    for (const genre in groupedByGenre) {
-      datasets.push({
-        label: `${story} - ${genre}`,
-        data: groupedByGenre[genre].map(entry => ({
-          x: entry.day,  
-          y: entry.rank, 
-        })),
-        fill: false,
-        borderColor: getRandomColor(),
-        tension: 0.2,  // curve of the line
-        pointRadius: 6,  // size of the points
-      });
+
+    let chartInstance = null;
+
+    async function fetchChartData(start, end) {
+    const res = await fetch(`/chart-data?start=${start}&end=${end}`);
+    return await res.json();
     }
-  }
 
-  // Create the chart
-  new Chart(document.getElementById('rankingChart'), {
+    function updateChart(data) {
+    const datasets = [];
+
+    for (const story in data) {
+        const groupedByGenre = data[story].reduce((acc, entry) => {
+        if (!acc[entry.genre]) acc[entry.genre] = [];
+        acc[entry.genre].push({ x: entry.day, y: entry.rank });
+        return acc;
+        }, {});
+
+        for (const genre in groupedByGenre) {
+        datasets.push({
+            label: `${story} - ${genre}`,
+            data: groupedByGenre[genre],
+            fill: false,
+            borderColor: getRandomColor(),
+            tension: 0.2,
+            pointRadius: 6,
+        });
+        }
+    }
+
+    chartInstance.data.datasets = datasets;
+    chartInstance.update();
+    }
+
+    [startInput, endInput].forEach(input => {
+    input.addEventListener('change', async () => {
+        const start = startInput.value;
+        const end = endInput.value;
+        if (start && end) {
+        const data = await fetchChartData(start, end);
+        updateChart(data);
+        }
+    });
+    });
+
+    function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    return '#' + Array.from({length: 6}, () => letters[Math.floor(Math.random() * 16)]).join('');
+    }
+
+    chartInstance = new Chart(document.getElementById('rankingChart'), {
     type: 'line',
-    data: {
-      datasets: datasets,
-    },
+    data: { datasets: [] },
     options: {
-      scales: {
-        x: {
-          type: 'category',
-          title: {
-            display: true,
-            text: 'Days',
-          },
-        },
-        y: {
-          min: 1,
-          max: 50,
-          reverse: true,  // Reverse the y-axis so the best rank is at the top
-          title: {
-            display: true,
-            text: 'Rank',
-          },
-        },
-      },
-    },
-  });
-})();
+        scales: {
+        x: { type: 'category', title: { display: true, text: 'Days' }},
+        y: { min: 1, max: 50, reverse: true, title: { display: true, text: 'Rank' }},
+        }
+    }
+    });
 
-function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
+    // Load initial data
+    (async function initChart() {
+    const data = await fetchChartData(startInput.value, endInput.value);
+    updateChart(data);
+    })();
 </script>
