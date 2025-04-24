@@ -113,46 +113,63 @@ class DefaultController extends AbstractController
         foreach ($activeEntries as $entry) {
             $humanReadableGenre = RSMatch::getHumanReadableName($entry->getGenre());
             if (in_array($entry->getGenre(), RSMatch::ALL_GENRES, true) || $entry->getGenre() == 'main')  {
-                if ($entry->getHighestPosition() <= $user->getMinRankToNotify()) {
-                    $genreMatches[] = [
-                        'storyName' => $entry->getStoryID()->getStoryName(),
-                        'authorName' => $entry->getStoryID()->getStoryAuthor(),
-                        'date' => $entry->getDate(),
-                        'genre' => $humanReadableGenre,
-                        'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
-                        'highestPosition' => $entry->getHighestPosition(),
-                        'timeOnList' => $entry->getTimeOnList(),
-                        'timeOnListInt' => $entry->getTimeOnListInt(),
-                        'active' => $entry->getActive(),
-                    ];
-                    $genreData[$entry->getStoryID()->getStoryName()][] = [
-                        'rank' => $entry->getHighestPosition(),
-                        'genre' => $humanReadableGenre,
-                    ];
-                }
+                $genreMatches[] = [
+                    'storyName' => $entry->getStoryID()->getStoryName(),
+                    'authorName' => $entry->getStoryID()->getStoryAuthor(),
+                    'date' => $entry->getDate(),
+                    'genre' => $humanReadableGenre,
+                    'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
+                    'highestPosition' => $entry->getHighestPosition(),
+                    'timeOnList' => $entry->getTimeOnList(),
+                    'timeOnListInt' => $entry->getTimeOnListInt(),
+                    'active' => $entry->getActive(),
+                ];
+                $genreData[$entry->getStoryID()->getStoryName()][] = [
+                    'rank' => $entry->getHighestPosition(),
+                    'genre' => $humanReadableGenre,
+                ];
             } else {
-                if ($entry->getHighestPosition() <= $user->getMinRankToNotify()) {
-                    $tagMatches[] = [
-                        'storyName' => $entry->getStoryID()->getStoryName(),
-                        'authorName' => $entry->getStoryID()->getStoryAuthor(),
-                        'date' => $entry->getDate(),
-                        'genre' => $humanReadableGenre,
-                        'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
-                        'highestPosition' => $entry->getHighestPosition(),
-                        'timeOnList' => $entry->getTimeOnList(),
-                        'timeOnListInt' => $entry->getTimeOnListInt(),
-                        'active' => $entry->getActive(),
-                    ];
+                $tagMatches[] = [
+                    'storyName' => $entry->getStoryID()->getStoryName(),
+                    'authorName' => $entry->getStoryID()->getStoryAuthor(),
+                    'date' => $entry->getDate(),
+                    'genre' => $humanReadableGenre,
+                    'rsLink' => "https://www.royalroad.com/fictions/rising-stars?genre=" . $entry->getGenre(),
+                    'highestPosition' => $entry->getHighestPosition(),
+                    'timeOnList' => $entry->getTimeOnList(),
+                    'timeOnListInt' => $entry->getTimeOnListInt(),
+                    'active' => $entry->getActive(),
+                ];
 
-                    $tagData[$entry->getStoryID()->getStoryName()][] = [
-                        'rank' => $entry->getHighestPosition(),
-                        'genre' => $humanReadableGenre,
-                    ];
-                }
-            }
-            
+                $tagData[$entry->getStoryID()->getStoryName()][] = [
+                    'rank' => $entry->getHighestPosition(),
+                    'genre' => $humanReadableGenre,
+                ];
+            } 
         }
-
+        // remove duplicates and keep only the highest rank for the graph
+        foreach ($genreData as $storyName => &$genres) {
+            $genres = array_values(array_reduce($genres, function ($carry, $entry) {
+                $genre = $entry['genre'];
+                if (!isset($carry[$genre]) || $entry['rank'] < $carry[$genre]['rank']) {
+                    $carry[$genre] = $entry;
+                }
+                return $carry;
+            }, []));
+        }
+        unset($genres); 
+        // remove duplicates and keep only the highest rank for the graph
+        foreach ($tagData as $storyName => &$genres) {
+            $genres = array_values(array_reduce($genres, function ($carry, $entry) {
+                $genre = $entry['genre'];
+                if (!isset($carry[$genre]) || $entry['rank'] < $carry[$genre]['rank']) {
+                    $carry[$genre] = $entry;
+                }
+                return $carry;
+            }, []));
+        }
+        unset($genres); 
+        
         $genreChartData = [];
         foreach ($genreData as $name => $entries) {
             $genreChartData[] = [

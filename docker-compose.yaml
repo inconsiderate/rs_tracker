@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      PHP_MEMORY_LIMIT: 512M
     container_name: rs_tracker_app
     volumes:
       - ./html/:/var/www/html

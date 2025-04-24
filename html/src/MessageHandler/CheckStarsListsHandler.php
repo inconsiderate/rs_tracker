@@ -4,6 +4,7 @@ namespace App\MessageHandler;
 
 use App\Entity\Story;
 use App\Entity\RSMatch;
+use App\Entity\RSDaily;
 use App\Message\CheckStarsLists;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -196,15 +197,54 @@ final class CheckStarsListsHandler
         foreach ($matches as $match) {
             $storyId = $match['storyId'];
             $position = $match['position'];
-    
+            $dateToday = (new \DateTimeImmutable('today'));
+
             if (!isset($existingStoriesMap[$storyId])) {
                 // echo (new \DateTime())->format('Y-m-d H:i:s') . " Story ID {$storyId} found in matches but does not exist in the database. Skipping." . PHP_EOL;
                 continue;
             }
             $sendEmail = false;
             $storyEntity = $existingStoriesMap[$storyId];
+
+            //update the daily highest rank for this story + genre
+            $dailyMatch = $this->entityManager->getRepository(RSDaily::class)
+            ->createQueryBuilder('r')
+            ->where('r.story = :story_id')
+            ->andWhere('r.genre = :genre')
+            ->andWhere('r.date = :dateToday')
+            ->setParameter('story_id', $storyEntity)
+            ->setParameter('genre', $genre)
+            ->setParameter('dateToday', $dateToday)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+            if ($dailyMatch) {
+                //update row
+                if ($dailyMatch->getHighestPosition() > $position) {
+                    $dailyMatch->setHighestPosition($position);
+                }
+            } else {
+                //create a new row
+                $newDailyMatch = new RSDaily();
+                $newDailyMatch->setStory($storyEntity);
+                $newDailyMatch->setGenre($genre);
+                $newDailyMatch->setHighestPosition($position);
+                $newDailyMatch->setDate(new \DateTimeImmutable('today'));
+                
+                $newEntries[] = $newDailyMatch;
+            }
+
+
+    
             $existingEntry = $this->entityManager->getRepository(RSMatch::class)
-                ->findOneBy(['storyID' => $storyEntity, 'genre' => $genre, 'active' => 1]);
+            ->createQueryBuilder('r')
+            ->where('r.storyID = :storyID')
+            ->andWhere('r.genre = :genre')
+            ->andWhere('r.active > 0')
+            ->setParameter('storyID', $storyEntity)
+            ->setParameter('genre', $genre)
+            ->getQuery()
+            ->getOneOrNullResult();
     
             if ($existingEntry) {
                 if ($existingEntry->getHighestPosition() > $position) {

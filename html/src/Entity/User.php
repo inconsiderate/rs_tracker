@@ -219,12 +219,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->preferences['displayHiddenLists'] ?? false;
     }
     
+    // public function getEmailHiddenLists(): bool
+    // {
+    //     if (!$this->isSubscribed()) {
+    //         return false;
+    //     }
+    //     return $this->preferences['emailHiddenLists'] ?? false;
+    // }
+    
     public function getEmailHiddenLists(): bool
     {
-        if (!$this->isSubscribed()) {
-            return false;
-        }
-        return $this->preferences['emailHiddenLists'] ?? false;
+        return $this->preferences['emailHiddenLists'] ?? true;
     }
     
     public function getSendMeEmails(): bool
