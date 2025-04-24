@@ -6,21 +6,45 @@
 
         <div class="card-title p-3">
         
-            <h1 class="">Search Rising Stars History</h1>
+            <h2 class="">Search Rising Stars</h2>
+
             <form action="{{ path('app_story_search') }}" method="POST" class="row g-3">
                 {{ form_widget(form._token) }}
                 <div class="input-group mb-3">
                     <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                    {{ form_widget(form.query, {'attr': {'placeholder': 'Search', 'class': 'form-control'}}) }}
+                    {{ form_widget(form.query, {'attr': {'placeholder': 'The Pub Between', 'class': 'form-control'}}) }}
                     <button class="btn btn-outline-secondary" type="submit">Search</button>
                 </div>
             </form>
         </div>
 
         <div class="card-body">
-            <h2><a href="{{ story.storyAddress }}">{{ story.storyName }}</a><span class="h5"> - {{ story.storyAuthor }}</span></h2>
-            <p>{{ story.blurb }}...</p>
-            <table class="table table-hover" id="rsResults">
+            <h1><a href="{{ story.storyAddress }}">{{ story.storyName }}</a><span class="h5"> - {{ story.storyAuthor }}</span></h1>
+
+            <h2 class="mt-6 text-center">Current Positions</h2>
+            
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 text-center">
+                    <div id="spinner" class="my-3 d-none">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <br/><span class="">Searching... this may take a minute...</span>
+                    </div>
+                    <a href="#" id="loadDataBtn" class="btn btn-primary mb-3">Check Current Positions</a>
+                    <table class="table table-hover d-none" id="rsResults">
+                        <thead>
+                            <tr>
+                                <th>RS list</th>
+                                <th>Current Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h2 class="mt-6 text-center">Historic Positions</h2>
+            <p class="card-title p-3" style="font-size: small;">Each time the story gets on a list, a new row is created in the table. If it fall off the list and gets back on it a few days later, that will be two different rows with two different durations. The highest position the story reached during each run on the list is what is displayed here.</p>
+            <table class="table table-hover" id="historicResults">
                 <thead>
                     <tr>
                         <th>Entered List</th>
@@ -60,33 +84,75 @@
             {% if app.user and not app.user.isSubscribed or not app.user  %}
                 {% include 'partials/_ad_unlock_block.html.twig' %}
             {% endif %}
-            {# <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9916141306714493"
-                crossorigin="anonymous"></script>
-            <!-- responsive -->
-            <ins class="adsbygoogle"
-                style="display:block"
-                data-ad-client="ca-pub-9916141306714493"
-                data-ad-slot="7872737364"
-                data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script> #}
-
         </div>
     </div>
 </div>
 {% endblock %}
 
-
-
 {% block javascripts %}
     <script>
-        $('#rsResults').DataTable({
+        $('#historicResults').DataTable({
             pageLength: 50,
                 order: [
                     [1, 'asc']
                 ]
         });
     </script>
+
+    
+<script>
+    document.getElementById('loadDataBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const table = document.getElementById('rsResults'); 
+    const tbody = document.getElementById('rsTableBody');
+    const spinner = document.getElementById('spinner');
+    const loadDataBtn = document.getElementById('loadDataBtn');
+
+    tbody.innerHTML = ''; 
+    spinner.classList.remove('d-none');
+    loadDataBtn.classList.add('d-none'); 
+
+    let dataTableInstance = table.DataTable || null;
+
+    if (!dataTableInstance) {
+        dataTableInstance = new DataTable(table, {
+            paging: false,
+            searching: false,
+            info: false,
+            order: [
+                [1, 'desc']
+            ]
+        });
+    }
+
+    try {
+        const res = await fetch(`/get-current-position?story_id={{story.storyid}}`);
+        const data = await res.json();
+
+        const rows = [];
+        for (const [genre, position] of Object.entries(data)) {
+            rows.push([`<a href="https://www.royalroad.com/fictions/rising-stars?genre=${genre}#:~:text={{ story.storyName }}">${genre}</a>`, position]);
+        }
+
+        dataTableInstance.clear();
+        dataTableInstance.rows.add(rows);
+        dataTableInstance.draw();
+
+    } catch (error) {
+        console.error('Error fetching positions:', error);
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="2">Failed to load data.</td>`;
+        tbody.appendChild(row);
+    }
+
+    spinner.classList.add('d-none'); 
+    table.classList.remove('d-none'); 
+    loadDataBtn.classList.remove('d-none');
+    loadDataBtn.textContent = 'Reload Current Positions';
+});
+
+</script>
+
+
 {% endblock %}

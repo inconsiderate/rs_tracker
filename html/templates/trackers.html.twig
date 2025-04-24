@@ -11,7 +11,10 @@
 
 <div class="card-group mt-3 mt-lg-5">
     <div class="card border-dark">
-        <h2 class="card-title p-3 mb-0">RS List History {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}(All Lists){% endif %}</h2>
+        <h2 class="card-title p-3 pb-0 mb-0">RS List History {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}(All Lists){% endif %}</h2>
+        <p class="card-title p-3" style="font-size: small;">Each time the story gets on a list, a new row is created in the table. If it fall off the list and gets back on it a few days later, that will be two different rows with two different durations. The highest position the story reached during each run on the list is what is displayed here.</p>
+
+
         <div class="card-body">
             <table class="table">
                 <table class="table table-responsive" id="genreTable">
