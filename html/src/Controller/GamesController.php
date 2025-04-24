@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GamesController extends AbstractController
 {
-    private array $words = ["MAGIC", "LEVEL", "XP", "MANA", "STATS", "ITEMS", "FORCE", "POWER", "ENERGY", "HEALTH", "BOSS", "GEMS", "GRIND", "BOOST", "LORE", "BOOST", "FOES", "CHARM", "SOULS", "WEIGHT", "VEINS", "CLIMB", "CLASH", "SNEAK", "RECEIVE", "KNIGHT", "BLOOD", "FAITH"]
-    ;
+
+    private array $words = ["MAGIC", "LEVEL", "MANA", "STATS", "ITEMS", "FORCE", "POWER", "ENERGY", "HEALTH", "BOSS", "GEMS", "GRIND", "BOOST", "LORE", "BOOST", "FOES", "CHARM", "SOUL", "VEINS", "CLIMB", "CLASH", "SNEAK", "KNIGHT", "BLOOD", "FAITH"];
     private string $wordFile = __DIR__ . '/../../var/used_words.json';
 
     private function getUsedWords(): array
@@ -121,6 +121,7 @@ class GamesController extends AbstractController
             return $this->json([
                 'result' => $result,
                 'gameOver' => true,
+                'wordLength' => strlen($word),
                 'message' => 'Congratulations! You solved today\'s puzzle.'
             ]);
         }

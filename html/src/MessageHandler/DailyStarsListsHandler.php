@@ -26,29 +26,39 @@ final class DailyStarsListsHandler
     public function __invoke(DailyStarsLists $message)
     {
         $storiesWithUsers = $this->entityManager->getRepository(Story::class)->findStoriesWithUsers();
-        
+    
         foreach ($storiesWithUsers as $story) {
+            
             $storyId = $story->getId();
-            // Fetch open RSMatch rows for the story
             $openMatches = $this->entityManager->getRepository(RSMatch::class)->findOpenMatchesForStory($storyId);
-            // Fetch RSMatch rows that were closed in the last 24 hours
             $recentlyClosedMatches = $this->entityManager->getRepository(RSMatch::class)->findRecentlyClosedMatchesForStory($storyId);
+    
             $allMatches = array_merge($openMatches, $recentlyClosedMatches);
-        
-            // Save highest rank for the day for each genre
+    
+            // Group matches by genre and keep only the best rank
+            $bestRanksByGenre = [];
+    
             foreach ($allMatches as $match) {
-        
-                // Create the RSDaily entry
+                $genre = $match->getGenre();
+                $position = $match->getHighestPosition();
+    
+                if (!isset($bestRanksByGenre[$genre]) || $position < $bestRanksByGenre[$genre]->getHighestPosition()) {
+                    $bestRanksByGenre[$genre] = $match;
+                }
+            }
+    
+            // Create RSDaily entries for the best ranked match per genre
+            foreach ($bestRanksByGenre as $genre => $match) {    
                 $daily = new RSDaily();
                 $daily->setStory($story);
-                $daily->setGenre($match->getGenre());
+                $daily->setGenre($genre);
                 $daily->setHighestPosition($match->getHighestPosition());
                 $daily->setDate(new \DateTimeImmutable('today'));
     
                 $this->entityManager->persist($daily);
             }
         }
-        
+    
         $this->entityManager->flush();
     }
 }
