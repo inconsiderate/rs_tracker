@@ -26,7 +26,7 @@
         <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.1.8/datatables.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
-        <script data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTo1ZjU5YmIxYi0xYmFiLTQ4MWUtODRmOS05M2JhNGE3MGFjZTE=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
+
     </head>
 
     <!-- Google tag (gtag.js) -->
@@ -53,7 +53,7 @@
                     <div class="navbar-nav">
                         <a class="nav-link" href="/login">Login</a>
                         <a class="nav-link" href="/search">Search</a>
-                        <a class="nav-link" href="/games">Games</a>
+                        {# <a class="nav-link" href="/games">Games</a> #}
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <a class="nav-link" href="/trackers">Watcher Results</a>
                         <a class="nav-link" href="/trackers/edit">Edit Watchers</a>
@@ -76,9 +76,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/search">Search</a>
                         </li>
-                        <li class="nav-item">
+                        {# <li class="nav-item">
                             <a class="nav-link" href="/games">Games</a>
-                        </li>
+                        </li> #}
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <li class="nav-item">
                             <a class="nav-link" href="/trackers">Watcher Results</a>
