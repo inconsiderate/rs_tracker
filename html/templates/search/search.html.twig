@@ -7,7 +7,8 @@
         <div class="card-title p-3">
         
             <h1 class="">Search Rising Stars</h1>
-            <p>Search for stories by title or partial title</p>
+            <p>Search for stories by title or partial title.</p>
+            <p>If your story doesn't show up, it hasn't been ranked yet, and isn't being tracked by anyone. Login to start tracking your story!</p>
             {# <p class="alert alert-warning"><strong>NOTICE:</strong> The RS list algo is currently in a state of change, and you're going to see dozens of lines for RS stories in the search results. Please be patient while the site is updated to incorporate these changes.</p> #}
             <form action="{{ path('app_story_search') }}" method="POST" class="row g-3">
                 {{ form_widget(form._token) }}

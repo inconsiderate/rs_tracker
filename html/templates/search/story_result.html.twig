@@ -19,7 +19,7 @@
         </div>
 
         <div class="card-body">
-            <h1><a href="{{ story.storyAddress }}">{{ story.storyName }}</a><span class="h5"> - {{ story.storyAuthor }}</span></h1>
+            <h1><a href="{{ story.storyAddress }}">{{ story.storyName }}</a>{% if story.storyAuthor %}<span class="h5"> - by {{ story.storyAuthor }}</span>{% endif %}</h1>
 
             <h2 class="mt-6 text-center">Current Positions</h2>
             
@@ -29,12 +29,12 @@
                         <div class="spinner-border text-primary" role="status"></div>
                         <br/><span class="">Searching... this may take a minute...</span>
                     </div>
-                    <a href="#" id="loadDataBtn" class="btn btn-primary mb-3">Check Current Positions</a>
+                    <a href="#" id="loadDataBtn" class="btn btn-lg btn-info w-50 text-center">Fetch Current RS Positions</a>
                     <table class="table table-hover d-none" id="rsResults">
                         <thead>
                             <tr>
-                                <th>RS list</th>
-                                <th>Current Position</th>
+                                <th class="text-center">RS list</th>
+                                <th class="text-center">Current Position</th>
                             </tr>
                         </thead>
                         <tbody id="rsTableBody"></tbody>
@@ -149,7 +149,7 @@
     spinner.classList.add('d-none'); 
     table.classList.remove('d-none'); 
     loadDataBtn.classList.remove('d-none');
-    loadDataBtn.textContent = 'Reload Current Positions';
+    loadDataBtn.textContent = 'Reload Current RS Positions';
 });
 
 </script>

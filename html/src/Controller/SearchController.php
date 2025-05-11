@@ -66,6 +66,10 @@ class SearchController extends AbstractController
             $genreUrl = $baseGenreUrl . urlencode($genre);
             $genres[$genre] = $this->fetchStoryPositionByGenre($genreUrl, $storyId);
         }
+        foreach (RSMatch::ALL_TAGS as $genre) {
+            $genreUrl = $baseGenreUrl . urlencode($genre);
+            $genres[$genre] = $this->fetchStoryPositionByGenre($genreUrl, $storyId);
+        }
         
         return $this->json($genres);
     }
