@@ -78,7 +78,15 @@ class RSMatch
     public const WUXIA = 'wuxia';
     public const XIANXIA = 'xianxia';
 
-
+    // Content Warnings
+    public const AI_ASSISTED = 'ai_assisted';
+    public const AI_GENERATED = 'ai_generated';
+    public const VIOLENCE = 'graphic_violence';
+    public const SENSITIVE = 'sensitive';
+    public const PROFANITY = 'profanity';
+    public const SEXUALITY = 'sexuality';
+    public const FANFIC = 'fanfic';
+    
     public const ALL_GENRES = [
         self::ADVENTURE,
         self::ACTION,
@@ -96,7 +104,6 @@ class RSMatch
         self::ONE_SHOT,
         self::TRAGEDY,
     ];
-
     
     public const ALL_TAGS = [
         self::ANTI_HERO_LEAD,
@@ -148,6 +155,16 @@ class RSMatch
         self::WAR_AND_MILITARY,
         self::WUXIA,
         self::XIANXIA,
+    ];
+    
+    public const ALL_CONTENT_TAGS = [
+        self::AI_ASSISTED,
+        self::AI_GENERATED,
+        self::VIOLENCE,
+        self::SENSITIVE,
+        self::PROFANITY,
+        self::SEXUALITY,
+        self::FANFIC,
     ];
     
     public static function getHumanReadableName(string $genre): string

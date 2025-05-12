@@ -69,7 +69,29 @@ final class CheckStarsListsHandler
         }
 
         // then pull data for all the secondary tags
+        echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars tags pages...' . PHP_EOL;
         foreach (RSMatch::ALL_TAGS as $genre) {
+            $genreUrl = $baseGenreUrl . urlencode($genre);
+            $genrePageContent = $this->fetchPageContent($genreUrl);
+        
+            $headers = @get_headers($genreUrl);
+            if (!$headers || strpos($headers[0], '404') !== false) {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: Page not found (404) - $genreUrl " . PHP_EOL;
+                throw new \Exception("Error: Page not found (404) - $genreUrl");
+            }
+            
+            if (empty($genrePageContent)) {
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "Error: No content returned from $genreUrl " . PHP_EOL;
+                throw new \Exception("Error: No content returned from $genreUrl.");
+            }
+            $matches = $this->verifyStoriesExist($genrePageContent, $genreUrl);
+            $this->processMatches($matches, $genre);
+        }
+        
+
+        // then pull data for all the content warning tags
+        echo (new \DateTime())->format('Y-m-d H:i:s') . ' >>>> Checking Rising Stars content warning pages...' . PHP_EOL;
+        foreach (RSMatch::ALL_CONTENT_TAGS as $genre) {
             $genreUrl = $baseGenreUrl . urlencode($genre);
             $genrePageContent = $this->fetchPageContent($genreUrl);
         
