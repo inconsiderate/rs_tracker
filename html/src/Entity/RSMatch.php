@@ -234,6 +234,13 @@ class RSMatch
             self::WAR_AND_MILITARY => 'War and Military',
             self::WUXIA => 'Wuxia',
             self::XIANXIA => 'Xianxia',
+            self::AI_ASSISTED => 'AI Assisted',
+            self::AI_GENERATED => 'AI Generated',
+            self::VIOLENCE => 'Violent Content',
+            self::SENSITIVE => 'Sensitive Content',
+            self::PROFANITY => 'Profanity/Language',
+            self::SEXUALITY => 'Sexual Content',
+            self::FANFIC => 'Fanfiction',
         ];
 
         return $genreNames[$genre] ?? $genre;

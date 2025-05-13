@@ -315,7 +315,7 @@ final class CheckStarsListsHandler
                 }
 
                 // if the genre is in the hidden list only send if they opt-in to hidden list
-                if (isset(RSMatch::ALL_TAGS[$genre]) && !$user->getEmailHiddenLists()) {
+                if ((isset(RSMatch::ALL_TAGS[$genre]) || isset(RSMatch::ALL_CONTENT_TAGS[$genre])) && !$user->getEmailHiddenLists()) {
                     $sendEmail = false;
                 }
             
