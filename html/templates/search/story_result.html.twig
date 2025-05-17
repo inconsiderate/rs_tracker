@@ -62,42 +62,44 @@
 
             <h2 class="mt-6 text-center">Historic Positions</h2>
             <p class="card-title p-3 w-lg-80" style="font-size: small;">Each time the story gets on a list, a new row is created in the table below. If it fall off the list and gets back on it a few days later, that will be two different rows with two different durations. The highest position the story reached during each run on the list is what is displayed here.</p>
-            <table class="table table-hover" id="historicResults">
-                <thead>
-                    <tr>
-                        <th>Entered List</th>
-                        <th>RS List</th>
-                        <th>Highest Position</th>
-                        <th>Consecutive<br/>Time on RS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% set allTags = ['main', 'adventure', 'action', 'comedy', 'contemporary', 'drama', 'fantasy', 'historical', 'horror', 'mystery', 'psychological', 'romance', 'satire', 'sci_fi', 'one_shot', 'tragedy'] %}
-                {% for match in story.RSMatches %}
-                    {% if match.genre in allTags %}
-                    <tr>
-                        <td data-order="{{match.date|date("Ymd")}}">{{match.date|date("M d, Y")}}</td>
-                        <td>{{match.genre|replace({'_': ' '})|title}}</td>
-                        <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
-                        <td data-order="{{match.timeOnListInt}}">{{match.timeOnList}} </td>
-                    </tr>
-                    {% else %}
-                        {% if app.user and app.user.isSubscribed and app.user.getDisplayHiddenLists %}
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="historicResults">
+                    <thead>
+                        <tr>
+                            <th>Entered List</th>
+                            <th>RS List</th>
+                            <th>Highest Position</th>
+                            <th>Consecutive<br/>Time on RS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% set allTags = ['main', 'adventure', 'action', 'comedy', 'contemporary', 'drama', 'fantasy', 'historical', 'horror', 'mystery', 'psychological', 'romance', 'satire', 'sci_fi', 'one_shot', 'tragedy'] %}
+                    {% for match in story.RSMatches %}
+                        {% if match.genre in allTags %}
                         <tr>
                             <td data-order="{{match.date|date("Ymd")}}">{{match.date|date("M d, Y")}}</td>
                             <td>{{match.genre|replace({'_': ' '})|title}}</td>
                             <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
                             <td data-order="{{match.timeOnListInt}}">{{match.timeOnList}} </td>
                         </tr>
+                        {% else %}
+                            {% if app.user and app.user.isSubscribed and app.user.getDisplayHiddenLists %}
+                            <tr>
+                                <td data-order="{{match.date|date("Ymd")}}">{{match.date|date("M d, Y")}}</td>
+                                <td>{{match.genre|replace({'_': ' '})|title}}</td>
+                                <td>{{match.highestPosition}} {% if match.active %}<i class="fa fa-star"></i>{% endif %}</td>
+                                <td data-order="{{match.timeOnListInt}}">{{match.timeOnList}} </td>
+                            </tr>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-                <tfoot>
-                    <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on this list!</td>
-                </tfoot>
-            </table>
-
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on this list!</td>
+                    </tfoot>
+                </table>
+            </div>
             
             {% if app.user and not app.user.isSubscribed or not app.user  %}
                 {% include 'partials/_ad_unlock_block.html.twig' %}

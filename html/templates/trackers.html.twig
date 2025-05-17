@@ -14,10 +14,9 @@
         <h2 class="card-title p-3 pb-0 mb-0">RS List History {% if app.user.isSubscribed and app.user.getDisplayHiddenLists %}(All Lists){% endif %}</h2>
         <p class="card-title p-3" style="font-size: small;">Each time the story gets on a list, a new row is created in the table. If it fall off the list and gets back on it a few days later, that will be two different rows with two different durations. The highest position the story reached during each run on the list is what is displayed here.</p>
 
-
-        <div class="card-body">
-            <table class="table">
-                <table class="table table-responsive" id="genreTable">
+        <div class="card-body">    
+            <div class="table-responsive">
+                <table class="table" id="genreTable">
                     <thead>
                         <tr>
                             <th>Entered List</th>
@@ -56,54 +55,56 @@
             </div>
         </div>    
     </div>
+</div>
   
 
-    {% if not app.user.isSubscribed %}
+{% if not app.user.isSubscribed %}
     <div class="card-group mt-3 mt-lg-3">
-        <div class="card border-dark"><a href="/profile" class="text-center m-4">Become a Patron to Unlock Subscriber Benefits</a>
+        <div class="card border-dark">
+            <a href="/profile" class="text-center m-4">Become a Patron to Unlock Subscriber Benefits</a>
         </div>
-        </div>
+    </div>
     {% if tagMatches %}
     <div class="card-group mt-3 mt-lg-3">
         <div class="card border-dark">
             <h2 class="card-title p-3">Secret RS List History</h2>
             <div class="card-body">
-                    <table class="table table-responsive" id="tagTable">
-                        <thead>
-                            <tr>
-                                <th>Entered List</th>
-                                <th>Story Title</th>
-                                <th>RS List</th>
-                                <th>Highest Position</th>
-                                <th>Consecutive<br/>Time on RS</th>
-                            </tr>
-                        </thead>
-                        <tbody style="filter: blur(2px);">
-                        {% set strings = ['Artificial Intelligence', 'Low Fantasy', 'Time Loop', 'Reincarnation', 'School Life', 'Steampunk', 'Supernatural', 'First Contact', 'Dungeon', 'Villainous Lead'] %}
-                        {% for item in tagMatches|slice(0, 4) %}
-                            {% set repeatStr = random(1, 5) %}
-                            
-                            <tr>
-                                <td>1̸̻́͐̍2̶̛̱̉/̵̝̘̀2̶̫̯̀̾̚2̶̩̒̋4̷͍͐ ̴̜̂̓0̴̙̺͆́4̸̮͂́:̴̥̜͛5̶̨̲̓̆5̵̽͜</td>
-                                <td>{{ range(1, repeatStr)|map(_ => 'P̶̝̃o̴̡̙̟͆w̴̭̫̟͑e̵͚̩̅̈́ŗ̶͕̀̾͗ȋ̷͔͑͜o̷̪̠̐r̴̨̟̋͊͐ ̸̧͎̊̅S̵͈̫͑ͅt̸̼̮̂o̴̠̩͚̐̕r̷̮͎̃͒y̴̧̛̯͛͛')|join('') }}</td>
-                                <td>{{ random(strings) }}</td>
-                                <td>{{ random(1, 50) }}</td>
-                                <td>1̶̛̜͖̾1̵̀ͅ ̶͚̥̌͠d̴̳̓a̵̳̐̓ỹ̵̙̤s̸͇̿͘ ̷̞̽2̷̹̯́̍ ̵̩͎̀ḣ̶͇ò̵̢̧͝u̴̥̇͠r̷̮̞͋s̶̟͙̓</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on the list!</td>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>    
-        </div>
+                <div class="table-responsive">
+                    <table class="table" id="tagTable">
+                            <thead>
+                                <tr>
+                                    <th>Entered List</th>
+                                    <th>Story Title</th>
+                                    <th>RS List</th>
+                                    <th>Highest Position</th>
+                                    <th>Consecutive<br/>Time on RS</th>
+                                </tr>
+                            </thead>
+                            <tbody style="filter: blur(2px);">
+                            {% set strings = ['Artificial Intelligence', 'Low Fantasy', 'Time Loop', 'Reincarnation', 'School Life', 'Steampunk', 'Supernatural', 'First Contact', 'Dungeon', 'Villainous Lead'] %}
+                            {% for item in tagMatches|slice(0, 4) %}
+                                {% set repeatStr = random(1, 5) %}
+                                
+                                <tr>
+                                    <td>1̸̻́͐̍2̶̛̱̉/̵̝̘̀2̶̫̯̀̾̚2̶̩̒̋4̷͍͐ ̴̜̂̓0̴̙̺͆́4̸̮͂́:̴̥̜͛5̶̨̲̓̆5̵̽͜</td>
+                                    <td>{{ range(1, repeatStr)|map(_ => 'P̶̝̃o̴̡̙̟͆w̴̭̫̟͑e̵͚̩̅̈́ŗ̶͕̀̾͗ȋ̷͔͑͜o̷̪̠̐r̴̨̟̋͊͐ ̸̧͎̊̅S̵͈̫͑ͅt̸̼̮̂o̴̠̩͚̐̕r̷̮͎̃͒y̴̧̛̯͛͛')|join('') }}</td>
+                                    <td>{{ random(strings) }}</td>
+                                    <td>{{ random(1, 50) }}</td>
+                                    <td>1̶̛̜͖̾1̵̀ͅ ̶͚̥̌͠d̴̳̓a̵̳̐̓ỹ̵̙̤s̸͇̿͘ ̷̞̽2̷̹̯́̍ ̵̩͎̀ḣ̶͇ò̵̢̧͝u̴̥̇͠r̷̮̞͋s̶̟͙̓</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <td scope="row" colspan="5"><i class="fa fa-star"></i> = this title is currently on the list!</td>
+                            </tfoot>
+                            </table>
+                        </div>
+                </div>    
+            </div>
+        </div>                       
     </div>
-                        
     {% endif %}
-    {% endif %}
-</div>
+{% endif %}
 
 {% endblock %}
 
