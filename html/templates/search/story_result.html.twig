@@ -24,17 +24,31 @@
             <h2 class="mt-6 text-center">Current Positions</h2>
             
             <div class="row justify-content-center">
-                <div class="col-12 col-md-6 text-center">
-                    <div id="spinner" class="my-3 d-none">
+                <div class="col-12 col-md-6">
+                    <div id="spinner" class="my-3 text-center d-none"> 
                         <div class="spinner-border text-primary" role="status"></div>
-                        <br/><span class="">Searching... please wait, this may take up to two minutes...</span>
+                        <br/><span>Searching... please wait, this will take a minute...</span>
                     </div>
-                    <a href="#" id="loadDataBtn" class="btn btn-lg btn-info w-50 text-center">Fetch Current RS Positions</a>
+                    <div id="searchBox" class="d-flex align-items-center justify-content-center gap-3">
+                        <a href="#" id="loadDataBtn" class="btn btn-lg btn-info">Fetch Current RS Positions</a>
+                        <div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeTags" name="includeTags" value="true">
+                                <label class="text-left form-check-label" for="includeTags">Include Hidden Tag Lists?</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="includeContent" name="includeContent" value="true">
+                                <label class="form-check-label" for="includeContent">Include Hidden Content Warning Lists?</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <table class="table table-hover d-none" id="rsResults">
                         <thead>
                             <tr>
                                 <th class="text-center">RS list</th>
                                 <th class="text-center">Current Position</th>
+                                <th class="text-center">List Type</th>
                             </tr>
                         </thead>
                         <tbody id="rsTableBody"></tbody>
@@ -43,7 +57,7 @@
             </div>
 
             <h2 class="mt-6 text-center">Historic Positions</h2>
-            <p class="card-title p-3" style="font-size: small;">Each time the story gets on a list, a new row is created in the table. If it fall off the list and gets back on it a few days later, that will be two different rows with two different durations. The highest position the story reached during each run on the list is what is displayed here.</p>
+            <p class="card-title p-3 w-lg-80" style="font-size: small;">Each time the story gets on a list, a new row is created in the table below. If it fall off the list and gets back on it a few days later, that will be two different rows with two different durations. The highest position the story reached during each run on the list is what is displayed here.</p>
             <table class="table table-hover" id="historicResults">
                 <thead>
                     <tr>
@@ -101,58 +115,87 @@
 
     
 <script>
-    document.getElementById('loadDataBtn').addEventListener('click', async (e) => {
+document.getElementById('loadDataBtn').addEventListener('click', async (e) => {
     e.preventDefault();
+    const includeTags = document.getElementById('includeTags').checked ? 1 : 0;
+    const includeContent = document.getElementById('includeContent').checked ? 1 : 0;
 
-    const table = document.getElementById('rsResults'); 
+    const table = document.getElementById('rsResults');
     const tbody = document.getElementById('rsTableBody');
     const spinner = document.getElementById('spinner');
     const loadDataBtn = document.getElementById('loadDataBtn');
+    const searchBox = document.getElementById('searchBox');
 
-    tbody.innerHTML = ''; 
+    tbody.innerHTML = '';
     spinner.classList.remove('d-none');
-    loadDataBtn.classList.add('d-none'); 
+    searchBox.classList.add('d-none');
+    table.classList.add('d-none');
 
-    let dataTableInstance = table.DataTable || null;
+    let dataTableInstance = $.fn.dataTable.isDataTable(table) ? $(table).DataTable() : null;
+    if (dataTableInstance) dataTableInstance.destroy();
 
-    if (!dataTableInstance) {
-        dataTableInstance = new DataTable(table, {
+    try {
+        const res = await fetch(`/get-current-position?story_id={{ story.storyid }}&tag=${includeTags}&content=${includeContent}`);
+        const data = await res.json();
+
+        const typeOrder = { main: 0, genre: 1, tag: 2 };
+        const rows = [];
+
+        for (const [key, info] of Object.entries(data)) {
+            const genreUrl = `https://www.royalroad.com/fictions/rising-stars?genre=${encodeURIComponent(key)}#:~:text={{ story.storyName }}`;
+            const position = parseInt(info.position, 10);
+            const positionValue = position > 0 ? 1 : 0;
+            const listType = info.type.toLowerCase();
+
+            rows.push([
+                `<a href="${genreUrl}" target="_blank">${key}</a>`,
+                position,
+                listType,
+                positionValue,
+                typeOrder[listType] ?? 3
+            ]);
+        }
+
+        const dataTable = $(table).DataTable({
+            data: rows,
+            columns: [
+                { title: 'RS List' },
+                { title: 'Current Position' },
+                { title: 'List Type' },
+                { title: 'SortValue', visible: false },
+                { title: 'TypeOrder', visible: false }
+            ],
             paging: false,
             searching: false,
             info: false,
             order: [
+                [3, 'desc'],
+                [4, 'asc'],
                 [1, 'desc']
+            ],
+            columnDefs: [
+                {
+                    targets: 1,
+                    render: (data) => data === 0 ? '-' : data
+                }
             ]
         });
-    }
-
-    try {
-        const res = await fetch(`/get-current-position?story_id={{story.storyid}}`);
-        const data = await res.json();
-
-        const rows = [];
-        for (const [genre, position] of Object.entries(data)) {
-            rows.push([`<a href="https://www.royalroad.com/fictions/rising-stars?genre=${genre}#:~:text={{ story.storyName }}">${genre}</a>`, position]);
-        }
-
-        dataTableInstance.clear();
-        dataTableInstance.rows.add(rows);
-        dataTableInstance.draw();
 
     } catch (error) {
-        console.error('Error fetching positions:', error);
+        console.error('Error: ', error);
         const row = document.createElement('tr');
-        row.innerHTML = `<td colspan="2">Failed to load data.</td>`;
+        row.innerHTML = `<td colspan="3">Failed to load data.</td>`;
         tbody.appendChild(row);
     }
 
-    spinner.classList.add('d-none'); 
-    table.classList.remove('d-none'); 
-    loadDataBtn.classList.remove('d-none');
+    spinner.classList.add('d-none');
+    table.classList.remove('d-none');
+    searchBox.classList.remove('d-none');
     loadDataBtn.textContent = 'Reload Current RS Positions';
 });
-
 </script>
+
+
 
 
 {% endblock %}

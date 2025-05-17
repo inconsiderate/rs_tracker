@@ -57,21 +57,45 @@ class SearchController extends AbstractController
     public function current_position(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $storyId = $request->query->get('story_id');
+        $tagQuery = $request->query->get('tag');
+        $contentQuery = $request->query->get('content');
         $baseGenreUrl = "https://www.royalroad.com/fictions/rising-stars?genre=";
-        $genres = [];
+        $results = [];
 
-        $genres['main'] = $this->fetchStoryPositionByGenre('https://www.royalroad.com/fictions/rising-stars', $storyId);
+        $results['Main Rising Stars'] = [
+            'position' => $this->fetchStoryPositionByGenre('https://www.royalroad.com/fictions/rising-stars', $storyId),
+            'type' => 'main'
+        ];
 
         foreach (RSMatch::ALL_GENRES as $genre) {
             $genreUrl = $baseGenreUrl . urlencode($genre);
-            $genres[$genre] = $this->fetchStoryPositionByGenre($genreUrl, $storyId);
+            $results[RSMatch::getHumanReadableName($genre)] = [
+                'position' => $this->fetchStoryPositionByGenre($genreUrl, $storyId),
+                'type' => 'genre'
+            ];
         }
-        foreach (RSMatch::ALL_TAGS as $genre) {
-            $genreUrl = $baseGenreUrl . urlencode($genre);
-            $genres[$genre] = $this->fetchStoryPositionByGenre($genreUrl, $storyId);
+
+        if ($tagQuery) {
+            foreach (RSMatch::ALL_TAGS as $tag) {
+                $tagUrl = $baseGenreUrl . urlencode($tag);
+                $results[RSMatch::getHumanReadableName($tag)] = [
+                    'position' => $this->fetchStoryPositionByGenre($tagUrl, $storyId),
+                    'type' => 'tag'
+                ];
+            }
         }
-        
-        return $this->json($genres);
+
+        if ($contentQuery) {
+            foreach (RSMatch::ALL_CONTENT_TAGS as $tag) {
+                $tagUrl = $baseGenreUrl . urlencode($tag);
+                $results[RSMatch::getHumanReadableName($tag)] = [
+                    'position' => $this->fetchStoryPositionByGenre($tagUrl, $storyId),
+                    'type' => 'content'
+                ];
+            }
+        }
+
+        return $this->json($results);
     }
     
     private function fetchStoryPositionByGenre($genreUrl, $targetStoryId)
@@ -82,7 +106,7 @@ class SearchController extends AbstractController
         }
     
         $crawler = new Crawler($content, $genreUrl);
-        $genrePosition = '-';
+        $genrePosition = 0;
     
         $crawler->filter('.fiction-list .fiction-list-item')->each(function (Crawler $node, $position) use (&$genrePosition, $targetStoryId) {
             $link = $node->filter('a')->link()->getUri();

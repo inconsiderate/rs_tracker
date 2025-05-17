@@ -40,6 +40,9 @@
                     </tbody>
                 </table>
             {% endif %}
+            <br/>
+            <p>No results, or not seeing what you're looking for? 
+            {% if not is_granted('IS_AUTHENTICATED_FULLY') %}<a href="/login">Log in</a> and track{% else %}<a href="/trackers/edit">Track</a>{% endif %} the story by the full URL instead!</p>
         </div>
 
         {# <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9916141306714493"
