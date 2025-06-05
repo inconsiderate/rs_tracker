@@ -52,6 +52,24 @@ class Story
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $blurb = null;
 
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    private ?int $latestFollowers = null;
+
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    private ?int $latestRatings = null;
+
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    private ?int $latestFavourites = null;
+
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    private ?int $latestViews = null;
+
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    private ?int $latestWords = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $coverImage = null;
+
     public function __construct()
     {
         $this->rSMatches = new ArrayCollection();
@@ -217,6 +235,72 @@ class Story
     {
         $this->blurb = $blurb;
 
+        return $this;
+    }
+
+    public function getLatestFollowers(): ?int
+    {
+        return $this->latestFollowers;
+    }
+
+    public function setLatestFollowers(?int $latestFollowers): static
+    {
+        $this->latestFollowers = $latestFollowers;
+        return $this;
+    }
+
+    public function getLatestRatings(): ?int
+    {
+        return $this->latestRatings;
+    }
+
+    public function setLatestRatings(?int $latestRatings): static
+    {
+        $this->latestRatings = $latestRatings;
+        return $this;
+    }
+
+    public function getLatestFavourites(): ?int
+    {
+        return $this->latestFavourites;
+    }
+
+    public function setLatestFavourites(?int $latestFavourites): static
+    {
+        $this->latestFavourites = $latestFavourites;
+        return $this;
+    }
+
+    public function getLatestViews(): ?int
+    {
+        return $this->latestViews;
+    }
+
+    public function setLatestViews(?int $latestViews): static
+    {
+        $this->latestViews = $latestViews;
+        return $this;
+    }
+
+    public function getLatestWords(): ?int
+    {
+        return $this->latestWords;
+    }
+
+    public function setLatestWords(?int $latestWords): static
+    {
+        $this->latestWords = $latestWords;
+        return $this;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): static
+    {
+        $this->coverImage = $coverImage;
         return $this;
     }
 }

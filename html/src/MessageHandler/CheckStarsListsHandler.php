@@ -124,7 +124,6 @@ final class CheckStarsListsHandler
                 // Create a new Story if it doesn't exist
 
                 $htmlContent = file_get_contents($match['storyAddress']);
-                
                 $crawler = new Crawler($htmlContent);
                 $storyName = $crawler->filter('.fic-title h1')->text();
                 $authorName = $crawler->filter('.fic-title h4 a')->text();
@@ -134,8 +133,12 @@ final class CheckStarsListsHandler
                 preg_match('/\/profile\/(\d+)/', $authorProfileUrl, $authorProfileMatches);
                 $authorId = $authorProfileMatches[1] ?? null;
 
+                // Grab cover image URL
+                $coverImageUrl = null;
+                if ($crawler->filter('.cover-art-container img')->count() > 0) {
+                    $coverImageUrl = $crawler->filter('.cover-art-container img')->attr('src');
+                }
 
-                // echo (new \DateTime())->format('Y-m-d H:i:s') . " {$match['storyName']} not in DB. Creating new story." . PHP_EOL;
                 $newStory = new Story();
                 $newStory->setStoryName($storyName);
                 $newStory->setStoryId($match['storyId']);
@@ -143,6 +146,7 @@ final class CheckStarsListsHandler
                 $newStory->setStoryAuthorId($authorId);
                 $newStory->setStoryAuthor($authorName);
                 $newStory->setBlurb($trimmedBlurb);
+                $newStory->setCoverImage($coverImageUrl); 
                 $this->entityManager->persist($newStory);
             }
         }
@@ -183,7 +187,13 @@ final class CheckStarsListsHandler
             // views count
             $viewsText = $node->filter(".fa-eye + span")->text('0');
             $views = (int) filter_var($viewsText, FILTER_SANITIZE_NUMBER_INT);
-            
+
+            // Grab cover image URL
+            $coverImageUrl = null;
+            if ($node->filter('.img.img-responsive')->count() > 0) {
+                $coverImageUrl = $node->filter('img.img-responsive')->attr('src');
+            }
+
             if (strpos($url, '/fiction/') !== false) {
                 $matches[$storyId] = [
                     'storyAddress' => $url,
@@ -191,7 +201,8 @@ final class CheckStarsListsHandler
                     'storyId' => $storyId,
                     'followers' => $followers,
                     'pages' => $pages,
-                    'views' => $views
+                    'views' => $views,
+                    'cover' => $coverImageUrl
                 ];
             }
         });

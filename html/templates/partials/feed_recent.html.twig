@@ -7,23 +7,32 @@
             <div class="card-body pt-sm-0 p-sm-5">
                 <div class="row fw-normal">
                     {% for item in recentFeedItems|slice(0, 20) %}
-                    <p class="card-text col-sm-6 p-3 pb-0"><a href="/search/{{item['id']}}">{{item['name']}}</a> ( <a href="{{item['url']}}"><i class="fa-solid fa-r"></i><i class="fa-solid fa-r"></i></a> )
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('refresh_story', { 'id': item.internalId }) }}" class="btn" onclick="event.preventDefault(); if(confirm('Are you sure you want to refresh this item?')) document.getElementById('refresh-form-{{ item.internalId }}').submit();">
-                        <i class="fa-solid fa-arrows-rotate"> </i>
-                        </a>
-                    {% endif %}
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex align-items-start">
+                            {% if item.coverImage %}
+                                <img src="{{item.coverImage}}" alt="Cover Image" class="me-3" style="width: 90px; height: auto; object-fit: cover; border-radius: 6px;">
+                            {% endif %}
+                            <div>
+                                <p class="card-text pb-0">
+                                    <a href="/search/{{item['id']}}">{{item['name']}}</a> ( <a href="{{item['url']}}"><i class="fa-solid fa-r"></i><i class="fa-solid fa-r"></i></a> )
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <a href="{{ path('refresh_story', { 'id': item.internalId }) }}" class="btn" onclick="event.preventDefault(); if(confirm('Are you sure you want to refresh this item?')) document.getElementById('refresh-form-{{ item.internalId }}').submit();">
+                                        <i class="fa-solid fa-arrows-rotate"> </i>
+                                        </a>
+                                    {% endif %}
 
-                    <br/>Ranked {{item['rank']}} in <strong>{{item['genre']|replace({'_': ' '})|title}}</strong> {{item['duration']}} ago
-                    <br/><em>{% if item['blurb'] %}{{item['blurb']}}...{% endif %}</em></p>
-
-                    {% if is_granted('ROLE_ADMIN') %}
-                    <form id="refresh-form-{{ item.internalId }}" action="{{ path('refresh_story', { 'id': item.internalId }) }}" method="GET" style="display: none;">
-                        <input type="hidden" name="_method" value="REFRESH">
-                        <input type="hidden" name="_token" value="{{ csrf_token('refresh' ~ item.internalId) }}">
-                    </form>
-                    {% endif %}
-
+                                    <br/>Ranked {{item['rank']}} in <strong>{{item['genre']|replace({'_': ' '})|title}}</strong> {{item['duration']}} ago
+                                    <br/><em>{% if item['blurb'] %}{{item['blurb']}}...{% endif %}</em>
+                                </p>
+                            </div>
+                        </div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <form id="refresh-form-{{ item.internalId }}" action="{{ path('refresh_story', { 'id': item.internalId }) }}" method="GET" style="display: none;">
+                            <input type="hidden" name="_method" value="REFRESH">
+                            <input type="hidden" name="_token" value="{{ csrf_token('refresh' ~ item.internalId) }}">
+                        </form>
+                        {% endif %}
+                    </div>
                     {% endfor %}
                 </div>
             </div>

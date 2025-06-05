@@ -56,6 +56,7 @@ class DefaultController extends AbstractController
             $feedItem['blurb'] = $item['blurb'];
             $feedItem['genre'] = RSMatch::getHumanReadableName($item['genre']);
             $feedItem['duration'] = $item['duration'];
+            $feedItem['coverImage'] = $item['story']->getCoverImage();
             $recentFeedItems[] = $feedItem;
         }
         // Render the form view
@@ -227,10 +228,17 @@ class DefaultController extends AbstractController
                 preg_match('/\/profile\/(\d+)/', $authorProfileUrl, $authorProfileMatches);
                 $authorId = $authorProfileMatches[1] ?? null;
 
+                // Grab cover image URL
+                $coverImageUrl = null;
+                if ($crawler->filter('.cover-art-container img')->count() > 0) {
+                    $coverImageUrl = $crawler->filter('.cover-art-container img')->attr('src');
+                }
+
                 $fetchedStory->setStoryName($storyName);
                 $fetchedStory->setStoryAuthorId($authorId);
                 $fetchedStory->setStoryAuthor($authorName);
                 $fetchedStory->setBlurb($trimmedBlurb);
+                $fetchedStory->setCoverImage($coverImageUrl);
                 $entityManager->persist($fetchedStory);
             }
             $entityManager->flush();
