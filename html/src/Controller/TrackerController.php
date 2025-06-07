@@ -60,6 +60,7 @@ class TrackerController extends AbstractController
 
 
         foreach ($activeEntries as $entry) {
+
             $humanReadableGenre = RSMatch::getHumanReadableName($entry->getGenre());
             if (in_array($entry->getGenre(), RSMatch::ALL_GENRES, true) || $entry->getGenre() == 'main')  {
                 $genreMatches[] = [
@@ -89,13 +90,13 @@ class TrackerController extends AbstractController
                     'timeOnListInt' => $entry->getTimeOnListInt(),
                     'active' => $entry->getActive(),
                 ];
-
                 $tagData[$entry->getStoryID()->getStoryName()][] = [
                     'rank' => $entry->getHighestPosition(),
                     'genre' => $humanReadableGenre,
                 ];
             } 
         }
+
         // remove duplicates and keep only the highest rank for the graph
         foreach ($genreData as $storyName => &$genres) {
             $genres = array_values(array_reduce($genres, function ($carry, $entry) {
@@ -145,6 +146,9 @@ class TrackerController extends AbstractController
                 }, $entries)
             ];
         }
+        $genreScaling = $this->calculateGenreScalingFactors($entityManager, $user);
+        // var_dump('Genre scaling factors: ' . json_encode($genreScaling));die;
+        $mainListProgress = $this->getMainListProgress($entityManager, $user, $genreScaling, 50);
 
         return $this->render('trackers.html.twig', [
             'genreMatches' => $genreMatches,
@@ -152,6 +156,8 @@ class TrackerController extends AbstractController
             'genreChartData' => json_encode($genreChartData),
             'tagChartData' => json_encode($tagChartData),
             'genreDailyData' => json_encode($genreDailyData),
+            'genreScaling' => $genreScaling,
+            'mainListProgress' => $mainListProgress,
         ]);
     }
 
@@ -180,5 +186,104 @@ class TrackerController extends AbstractController
         }
 
         return new JsonResponse($filtered);
+    }
+
+    private function getMainListProgress(EntityManagerInterface $entityManager, $user, $genreScaling, $mainListCutoff = 50): array
+    {
+        $trackedStories = $entityManager->getRepository(RSMatch::class)->findByUser($user);
+
+        $progress = [];
+        $seen = [];
+        foreach ($trackedStories as $entry) {
+            $story = $entry->getStoryID();
+            $storyId = $story->getId();
+
+            if (isset($seen[$storyId])) {
+                continue;
+            }
+            $seen[$storyId] = true;
+
+            $matches = $entityManager->getRepository(RSMatch::class)->findBy(['storyID' => $storyId]);
+            $positions = [];
+            foreach ($matches as $match) {
+                $positions[$match->getGenre()] = $match->getHighestPosition();
+            }
+
+            $mainPos = $positions['main'] ?? null;
+            unset($positions['main']);
+            $bestGenre = null;
+            $bestGenrePos = null;
+            if (!empty($positions)) {
+                $bestGenre = array_keys($positions, min($positions))[0];
+                $bestGenrePos = min($positions);
+            }
+
+            $scalingFactor = $genreScaling[$bestGenre] ?? null;
+            $estimatedMainPos = ($scalingFactor && $bestGenrePos) ? round($bestGenrePos * $scalingFactor) : null;
+
+            $distance = ($estimatedMainPos && $mainPos === null) ? $estimatedMainPos - $mainListCutoff : null;
+
+            $progress[] = [
+                'storyName' => $story->getStoryName(),
+                'mainPosition' => $mainPos,
+                'bestGenre' => $bestGenre,
+                'bestGenrePosition' => $bestGenrePos,
+                'estimatedMainPosition' => $estimatedMainPos,
+                'distanceToMain' => $distance,
+            ];
+        }
+
+        return $progress;
+    }
+
+    private function calculateGenreScalingFactors(EntityManagerInterface $entityManager): array
+    {
+        $today = (new \DateTime())->format('Y-m-d');
+
+        $mainEntries = $entityManager->getRepository(RSDaily::class)
+            ->createQueryBuilder('r')
+            ->where('r.genre = :main')
+            ->andWhere('r.date = :today')
+            ->setParameter('main', 'main')
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getResult();
+
+        $genreEntries = $entityManager->getRepository(RSDaily::class)
+            ->createQueryBuilder('r')
+            ->where('r.genre != :main')
+            ->andWhere('r.date = :today')
+            ->setParameter('main', 'main')
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getResult();
+
+        $positions = [];
+        foreach ($mainEntries as $entry) {
+            $storyId = $entry->getStory()->getId();
+            $positions[$storyId]['main'] = $entry->getHighestPosition();
+        }
+        foreach ($genreEntries as $entry) {
+            $storyId = $entry->getStory()->getId();
+            $genre = $entry->getGenre();
+            $positions[$storyId][$genre] = $entry->getHighestPosition();
+        }
+
+        $allGenres = RSMatch::ALL_GENRES ?? [];
+        $genreScaling = [];
+        foreach ($allGenres as $genre) {
+            if ($genre === 'main') continue;
+            $factors = [];
+            foreach ($positions as $storyId => $pos) {
+                if (isset($pos['main'], $pos[$genre]) && $pos[$genre] > 0) {
+                    $factors[] = $pos['main'] / $pos[$genre];
+                }
+            }
+            if (count($factors) > 0) {
+                $genreScaling[$genre] = round(array_sum($factors) / count($factors), 2);
+            }
+        }
+
+        return $genreScaling;
     }
 }

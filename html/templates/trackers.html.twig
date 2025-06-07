@@ -4,10 +4,46 @@
 
 {% include 'partials/_genre_daily.html.twig' %}
 
+
+<div class="card-group mt-3 mt-lg-5">
+    <div class="card border-dark">
+        <div class="card-body">    
+            <div class="table-responsive">    
+                <table class="table table-sm" id="distanceTable">
+                    <thead>
+                        <tr>
+                            <th>Story</th>
+                            <th>Estimated Distance to Main</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in mainListProgress %}
+                            <tr>
+                                <td>{{ item.storyName }}</td>
+                                <td>
+                                    {% if item.distanceToMain is not null %}
+                                        {% if item.distanceToMain > 0 %}
+                                            {{ item.distanceToMain }} positions away
+                                        {% else %}
+                                            On main list or would be!
+                                        {% endif %}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card-group support mt-3 mt-lg-5">
     {% include 'partials/_genre_record.html.twig' %}
     {% include 'partials/_tag_record.html.twig' %}
 </div>
+
 
 <div class="card-group mt-3 mt-lg-5">
     <div class="card border-dark">
@@ -56,7 +92,6 @@
         </div>    
     </div>
 </div>
-  
 
 {% if not app.user.isSubscribed %}
     <div class="card-group mt-3 mt-lg-3">
@@ -111,6 +146,13 @@
 {% block javascripts %}
     <script>
         $('#genreTable').DataTable({
+            pageLength: 50,
+                order: [
+                    [1, 'asc']
+                ]
+        });
+        $('#distanceTable').DataTable({
+            dom: 't',
             pageLength: 50,
                 order: [
                     [1, 'asc']
