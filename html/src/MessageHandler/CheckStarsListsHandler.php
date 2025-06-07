@@ -190,7 +190,7 @@ final class CheckStarsListsHandler
 
             // Grab cover image URL
             $coverImageUrl = null;
-            if ($node->filter('.img.img-responsive')->count() > 0) {
+            if ($node->filter('img.img-responsive')->count() > 0) {
                 $coverImageUrl = $node->filter('img.img-responsive')->attr('src');
             }
 
@@ -238,6 +238,11 @@ final class CheckStarsListsHandler
             }
             $sendEmail = false;
             $storyEntity = $existingStoriesMap[$storyId];
+
+            if (!empty($match['cover'])) {
+                $storyEntity->setCoverImage($match['cover']);
+                $this->entityManager->persist($storyEntity);
+            }
 
             //update the daily highest rank for this story + genre
             $dailyMatch = $this->entityManager->getRepository(RSDaily::class)
